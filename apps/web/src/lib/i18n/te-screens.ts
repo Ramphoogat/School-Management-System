@@ -221,5 +221,7 @@ const te: Record<string, string> = {
   'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'విద్యార్థులు, ఫీజులు, ప్రవేశాలు, సర్టిఫికెట్లు మరియు సెలవు అభ్యర్థనల జాబితాలు ఒకేసారి గరిష్టంగా ఎన్ని వరుసలు లోడ్ చేయాలి. పెద్ద సంఖ్య ఎక్కువ వరుసలు చూపుతుంది కానీ ఆ పేజీలను నెమ్మదిగా చేస్తుంది. జాబితా కత్తిరించబడితే ఒక నోటీసు చెబుతుంది.',
   'Rows per list': 'ఒక్కో జాబితాకు వరుసలు',
   'Enter a whole number from {min} to {max}.': '{min} నుండి {max} వరకు ఒక పూర్ణ సంఖ్యను నమోదు చేయండి.',
+  'Hide the class list': 'తరగతుల జాబితా దాచండి',
+  'Show the class list': 'తరగతుల జాబితా చూపండి',
 }
 export default te

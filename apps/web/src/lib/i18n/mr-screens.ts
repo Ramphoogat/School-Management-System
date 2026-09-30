@@ -221,5 +221,7 @@ const mr: Record<string, string> = {
   'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'विद्यार्थी, शुल्क, प्रवेश, प्रमाणपत्रे आणि रजेच्या विनंत्यांच्या याद्यांमध्ये एका वेळी जास्तीत जास्त किती ओळी लोड व्हाव्यात. मोठी संख्या जास्त ओळी दाखवते पण ती पृष्ठे संथ करते. यादी कापली गेल्यास एक सूचना तसे सांगते.',
   'Rows per list': 'प्रति यादी ओळी',
   'Enter a whole number from {min} to {max}.': '{min} ते {max} पर्यंत एखादी पूर्ण संख्या टाका.',
+  'Hide the class list': 'वर्गांची यादी लपवा',
+  'Show the class list': 'वर्गांची यादी दाखवा',
 }
 export default mr

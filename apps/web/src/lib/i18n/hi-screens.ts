@@ -221,5 +221,7 @@ const hi: Record<string, string> = {
   'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'छात्र, शुल्क, प्रवेश, प्रमाणपत्र और अवकाश अनुरोधों की सूचियों में एक बार में अधिकतम कितनी पंक्तियाँ लोड हों। बड़ी संख्या से ज़्यादा पंक्तियाँ दिखती हैं पर वे पृष्ठ धीमे हो जाते हैं। सूची कट जाने पर एक सूचना बताती है।',
   'Rows per list': 'प्रति सूची पंक्तियाँ',
   'Enter a whole number from {min} to {max}.': '{min} से {max} तक की कोई पूर्ण संख्या लिखें।',
+  'Hide the class list': 'कक्षा सूची छिपाएँ',
+  'Show the class list': 'कक्षा सूची दिखाएँ',
 }
 export default hi

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router'
-import { Home, LogOut, Menu, Palette, Plus, Search, Trash2, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Home, LogOut, Menu, Palette, Plus, Search, Trash2, X } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useT } from '@/lib/i18n'
 import { useAuth } from '@/lib/auth'
@@ -74,6 +74,9 @@ export default function Shell() {
     window.addEventListener('open-appearance', h)
     return () => window.removeEventListener('open-appearance', h)
   }, [])
+  // On tablets and phones the class rail (the strip with the Home button) can be shown or hidden with a small round button.
+  // It starts open on a tablet and closed on a phone. On a wide screen it is always shown and the button is not.
+  const [railOpen, setRailOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768)
   const [planNote, setPlanNote] = useState<'expiring' | 'grace' | 'overdue' | null>(null)
   const seesBilling = can('billing', 'read')
   useEffect(() => {
@@ -250,7 +253,7 @@ export default function Shell() {
   )
 
   return (
-    <div className="app-root isolate relative flex h-dvh flex-col bg-background md:flex-row">
+    <div className="app-root isolate relative flex h-dvh flex-col bg-background">
       <a
         href="#main"
         onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}
@@ -267,11 +270,23 @@ export default function Shell() {
         <span className="truncate font-semibold">{user?.school?.name ?? t('School Platform')}</span>
       </header>
 
-      {/* Desktop: rail + sidebar. Mobile: same content in a slide-over drawer. */}
-      <aside aria-label={t('Main menu')} className="hidden shrink-0 border-r md:flex md:w-[72px] lg:w-[312px]">
+      <div className="relative flex min-h-0 flex-1">
+      {/* Wide screens: rail + sidebar, always. Tablet and phone: the rail only, shown or hidden by the round button. */}
+      <aside aria-label={t('Main menu')} className={`shrink-0 border-r lg:flex lg:w-[312px] ${railOpen ? 'flex w-[72px]' : 'hidden'}`}>
         {rail}
         <div className="hidden min-w-0 flex-1 border-l lg:flex">{sidebar}</div>
       </aside>
+      <button
+        type="button"
+        onClick={() => setRailOpen((o) => !o)}
+        aria-expanded={railOpen}
+        aria-label={railOpen ? t('Hide the class list') : t('Show the class list')}
+        title={railOpen ? t('Hide the class list') : t('Show the class list')}
+        style={{ left: railOpen ? 72 : 14 }}
+        className="absolute top-3 z-30 flex size-6 -translate-x-1/2 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-md transition-[left] hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring lg:hidden"
+      >
+        {railOpen ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
+      </button>
 
       {open && (
         <div className="fixed inset-0 z-50 md:hidden">
@@ -286,7 +301,7 @@ export default function Shell() {
         </div>
       )}
 
-      <main id="main" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 focus:outline-none sm:p-6 lg:p-8">
+      <main id="main" tabIndex={-1} className={`min-w-0 flex-1 overflow-y-auto p-4 focus:outline-none sm:p-6 lg:p-8 ${railOpen ? '' : 'max-lg:pl-9'}`}>
         <div className="mx-auto w-full max-w-6xl">
           <div className="mb-4 flex justify-end">
             <Button variant="outline" size="sm" className="gap-2 text-muted-foreground" onClick={() => setCmd(true)}>
@@ -309,6 +324,7 @@ export default function Shell() {
           <AppearanceDialog open={look} onOpenChange={setLook} />
         </div>
       </main>
+      </div>
     </div>
   )
 }

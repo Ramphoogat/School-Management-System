@@ -221,5 +221,7 @@ const ta: Record<string, string> = {
   'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'மாணவர்கள், கட்டணங்கள், சேர்க்கைகள், சான்றிதழ்கள் மற்றும் விடுப்பு கோரிக்கைகளின் பட்டியல்கள் ஒரே நேரத்தில் அதிகபட்சம் எத்தனை வரிசைகளை ஏற்ற வேண்டும். பெரிய எண் அதிக வரிசைகளைக் காட்டும், ஆனால் அந்தப் பக்கங்களை மெதுவாக்கும். பட்டியல் வெட்டப்பட்டால் ஒரு அறிவிப்பு சொல்லும்.',
   'Rows per list': 'ஒரு பட்டியலுக்கான வரிசைகள்',
   'Enter a whole number from {min} to {max}.': '{min} முதல் {max} வரை ஒரு முழு எண்ணை உள்ளிடவும்.',
+  'Hide the class list': 'வகுப்புப் பட்டியலை மறை',
+  'Show the class list': 'வகுப்புப் பட்டியலைக் காட்டு',
 }
 export default ta
