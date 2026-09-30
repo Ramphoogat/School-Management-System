@@ -11,6 +11,7 @@ export const LANGUAGES = [
   { code: 'ta', name: 'தமிழ்' },
   { code: 'mr', name: 'मराठी' },
   { code: 'bgc', name: 'हरियाणवी' },
+  { code: 'sa', name: 'संस्कृतम्' },
 ] as const
 export type Lang = (typeof LANGUAGES)[number]['code']
 
@@ -23,6 +24,8 @@ const loaders: Record<Exclude<Lang, 'en'>, () => Promise<{ default: Dict }>> = {
   ta: both(() => import('./i18n/ta'), () => import('./i18n/ta-screens')),
   mr: both(() => import('./i18n/mr'), () => import('./i18n/mr-screens')),
   // Haryanvi: the Hindi translations with Haryanvi wording laid over them
+  // Sanskrit: the Hindi translations with Sanskrit laid over them
+  sa: async () => ({ default: { ...(await import('./i18n/hi')).default, ...(await import('./i18n/hi-screens')).default, ...(await import('./i18n/sa')).default } }),
   bgc: async () => ({ default: { ...(await import('./i18n/hi')).default, ...(await import('./i18n/hi-screens')).default, ...(await import('./i18n/bgc')).default } }),
 }
 
@@ -68,7 +71,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return vars ? s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k] ?? '') : m)) : s
   }, [dict])
 
-  const value = useMemo(() => ({ lang, locale: lang === 'bgc' ? 'hi' : lang, setLang, t }), [lang, setLang, t])
+  const value = useMemo(() => ({ lang, locale: lang === 'bgc' || lang === 'sa' ? 'hi' : lang, setLang, t }), [lang, setLang, t])
   return <LangCtx.Provider value={value}>{children}</LangCtx.Provider>
 }
 

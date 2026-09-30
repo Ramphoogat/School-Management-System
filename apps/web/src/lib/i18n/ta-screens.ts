@@ -217,5 +217,9 @@ const ta: Record<string, string> = {
   'Voice channel created': 'குரல் சேனல் உருவாக்கப்பட்டது', 'Channel deleted': 'சேனல் நீக்கப்பட்டது', 'New voice channel, e.g. Study room 1': 'புதிய குரல் சேனல், எ.கா: படிப்பு அறை 1', 'No voice channels yet.': 'இன்னும் குரல் சேனல்கள் இல்லை.', 'Confirm delete': 'நீக்குவதை உறுதிப்படுத்து',
   'Calls are for up to {max} people. Your microphone and camera stay off until you turn them on.': 'அழைப்பில் அதிகபட்சம் {max} பேர் இருக்கலாம். நீங்கள் இயக்கும் வரை உங்கள் மைக்ரோஃபோனும் கேமராவும் அணைந்தே இருக்கும்.',
   'Showing the first {shown} of {total}. Use the search or filters to find the rest.': 'மொத்தம் {total} இல் முதல் {shown} காட்டப்பட்டுள்ளன. மீதமுள்ளவற்றைக் காண தேடல் அல்லது வடிகட்டிகளைப் பயன்படுத்தவும்.',
+  'Long lists': 'நீண்ட பட்டியல்கள்',
+  'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'மாணவர்கள், கட்டணங்கள், சேர்க்கைகள், சான்றிதழ்கள் மற்றும் விடுப்பு கோரிக்கைகளின் பட்டியல்கள் ஒரே நேரத்தில் அதிகபட்சம் எத்தனை வரிசைகளை ஏற்ற வேண்டும். பெரிய எண் அதிக வரிசைகளைக் காட்டும், ஆனால் அந்தப் பக்கங்களை மெதுவாக்கும். பட்டியல் வெட்டப்பட்டால் ஒரு அறிவிப்பு சொல்லும்.',
+  'Rows per list': 'ஒரு பட்டியலுக்கான வரிசைகள்',
+  'Enter a whole number from {min} to {max}.': '{min} முதல் {max} வரை ஒரு முழு எண்ணை உள்ளிடவும்.',
 }
 export default ta

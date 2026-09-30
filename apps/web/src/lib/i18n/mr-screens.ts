@@ -217,5 +217,9 @@ const mr: Record<string, string> = {
   'Voice channel created': 'व्हॉइस चॅनेल तयार झाले', 'Channel deleted': 'चॅनेल हटवले', 'New voice channel, e.g. Study room 1': 'नवीन व्हॉइस चॅनेल, उदा. अभ्यास खोली 1', 'No voice channels yet.': 'अजून व्हॉइस चॅनेल नाहीत.', 'Confirm delete': 'हटवण्याची खात्री करा',
   'Calls are for up to {max} people. Your microphone and camera stay off until you turn them on.': 'कॉलमध्ये जास्तीत जास्त {max} लोक असू शकतात. तुम्ही चालू करेपर्यंत तुमचा मायक्रोफोन आणि कॅमेरा बंद राहतो.',
   'Showing the first {shown} of {total}. Use the search or filters to find the rest.': 'एकूण {total} पैकी पहिले {shown} दाखवले आहेत. बाकीचे शोधण्यासाठी शोध किंवा फिल्टर वापरा.',
+  'Long lists': 'लांब याद्या',
+  'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'विद्यार्थी, शुल्क, प्रवेश, प्रमाणपत्रे आणि रजेच्या विनंत्यांच्या याद्यांमध्ये एका वेळी जास्तीत जास्त किती ओळी लोड व्हाव्यात. मोठी संख्या जास्त ओळी दाखवते पण ती पृष्ठे संथ करते. यादी कापली गेल्यास एक सूचना तसे सांगते.',
+  'Rows per list': 'प्रति यादी ओळी',
+  'Enter a whole number from {min} to {max}.': '{min} ते {max} पर्यंत एखादी पूर्ण संख्या टाका.',
 }
 export default mr

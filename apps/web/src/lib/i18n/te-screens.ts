@@ -217,5 +217,9 @@ const te: Record<string, string> = {
   'Voice channel created': 'వాయిస్ ఛానెల్ సృష్టించబడింది', 'Channel deleted': 'ఛానెల్ తొలగించబడింది', 'New voice channel, e.g. Study room 1': 'కొత్త వాయిస్ ఛానెల్, ఉదా: స్టడీ రూమ్ 1', 'No voice channels yet.': 'ఇంకా వాయిస్ ఛానెల్‌లు లేవు.', 'Confirm delete': 'తొలగింపును నిర్ధారించండి',
   'Calls are for up to {max} people. Your microphone and camera stay off until you turn them on.': 'కాల్‌లో గరిష్టంగా {max} మంది ఉండవచ్చు. మీరు ఆన్ చేసే వరకు మీ మైక్రోఫోన్ మరియు కెమెరా ఆఫ్‌లో ఉంటాయి.',
   'Showing the first {shown} of {total}. Use the search or filters to find the rest.': 'మొత్తం {total}లో మొదటి {shown} చూపబడ్డాయి. మిగతావి కనుగొనడానికి శోధన లేదా ఫిల్టర్‌లు వాడండి.',
+  'Long lists': 'పొడవైన జాబితాలు',
+  'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'విద్యార్థులు, ఫీజులు, ప్రవేశాలు, సర్టిఫికెట్లు మరియు సెలవు అభ్యర్థనల జాబితాలు ఒకేసారి గరిష్టంగా ఎన్ని వరుసలు లోడ్ చేయాలి. పెద్ద సంఖ్య ఎక్కువ వరుసలు చూపుతుంది కానీ ఆ పేజీలను నెమ్మదిగా చేస్తుంది. జాబితా కత్తిరించబడితే ఒక నోటీసు చెబుతుంది.',
+  'Rows per list': 'ఒక్కో జాబితాకు వరుసలు',
+  'Enter a whole number from {min} to {max}.': '{min} నుండి {max} వరకు ఒక పూర్ణ సంఖ్యను నమోదు చేయండి.',
 }
 export default te

@@ -217,5 +217,9 @@ const hi: Record<string, string> = {
   'Voice channel created': 'वॉइस चैनल बन गया', 'Channel deleted': 'चैनल हटाया गया', 'New voice channel, e.g. Study room 1': 'नया वॉइस चैनल, जैसे स्टडी रूम 1', 'No voice channels yet.': 'अभी कोई वॉइस चैनल नहीं।', 'Confirm delete': 'हटाने की पुष्टि करें',
   'Calls are for up to {max} people. Your microphone and camera stay off until you turn them on.': 'कॉल में अधिकतम {max} लोग हो सकते हैं। आपका माइक्रोफ़ोन और कैमरा तब तक बंद रहते हैं जब तक आप उन्हें चालू न करें।',
   'Showing the first {shown} of {total}. Use the search or filters to find the rest.': 'पहले {shown} दिखाए गए, कुल {total}। बाकी खोजने के लिए खोज या फ़िल्टर का उपयोग करें।',
+  'Long lists': 'लंबी सूचियाँ',
+  'The most rows that students, fees, admissions, certificates and leave requests load at once. A larger number shows more rows but makes those pages slower. When a list is cut off, a notice says so.': 'छात्र, शुल्क, प्रवेश, प्रमाणपत्र और अवकाश अनुरोधों की सूचियों में एक बार में अधिकतम कितनी पंक्तियाँ लोड हों। बड़ी संख्या से ज़्यादा पंक्तियाँ दिखती हैं पर वे पृष्ठ धीमे हो जाते हैं। सूची कट जाने पर एक सूचना बताती है।',
+  'Rows per list': 'प्रति सूची पंक्तियाँ',
+  'Enter a whole number from {min} to {max}.': '{min} से {max} तक की कोई पूर्ण संख्या लिखें।',
 }
 export default hi

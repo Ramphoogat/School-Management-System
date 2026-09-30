@@ -39,8 +39,10 @@ const holes = (s) => (s.match(/\{\w+\}/g) ?? []).sort().join(',')
 
 const missing = Object.fromEntries(LANGS.map((l) => [l, [...used.keys()].filter((k) => !(k in dicts[l]))]))
 const broken = []
-const bgc = (await import(pathToFileURL(fileURLToPath(new URL('../src/lib/i18n/bgc.ts', import.meta.url))).href)).default
-for (const [k, v] of Object.entries(bgc)) if (holes(k) !== holes(v)) broken.push(`bgc: "${k}" -> "${v}"`)
+for (const layer of ['bgc', 'sa']) {
+  const d = (await import(pathToFileURL(fileURLToPath(new URL(`../src/lib/i18n/${layer}.ts`, import.meta.url))).href)).default
+  for (const [k, v] of Object.entries(d)) if (holes(k) !== holes(v)) broken.push(`${layer}: "${k}" -> "${v}"`)
+}
 for (const l of LANGS) for (const [k, v] of Object.entries(dicts[l])) if (holes(k) !== holes(v)) broken.push(`${l}: "${k}" -> "${v}"`)
 
 const arg = process.argv.indexOf('--missing')

@@ -19,7 +19,7 @@ differ, this section and the code win.
 - Operations: admissions with CSV import, fees with online payment (Razorpay), waivers, full and partial refunds and reminders, ID cards with photos, school-wide documents, class resources.
 - Communication: announcements (editable), class chat, voice channels, direct messages (attachments, edit, delete, read receipts, block, report and review), notifications by in-app, email and WhatsApp with quiet hours and editable wording.
 - Many schools on one platform: a super admin creates and suspends schools, each school has its own address, branding, plan and data, and can export or (by the super admin) permanently delete its data.
-- Five interface languages (English, Hindi, Telugu, Tamil, Marathi) and a partial Haryanvi layer, themes and wallpapers that keep text readable, and an accessibility pass (landmarks, skip link, keyboard, contrast).
+- Five interface languages (English, Hindi, Telugu, Tamil, Marathi) and partial Haryanvi and Sanskrit layers, themes and wallpapers that keep text readable, and an accessibility pass (landmarks, skip link, keyboard, contrast).
 
 **How it is actually built** (this differs from section 9 in places)
 
@@ -568,7 +568,7 @@ For a fuller walk-through see `docs/SETUP.md`.
 
 - **Multi-school was built after launch scope** (section 13): many schools, a super admin who cannot read school data, plans and manual billing, per-school export and deletion.
 - **Files** go to local disk or an S3-compatible bucket behind one small storage layer; private messages, passwords and stored files are never part of a school export.
-- **Languages** are built into the app (English, Hindi, Telugu, Tamil, Marathi, plus a partial Haryanvi layer over Hindi). English text in the code is the key, so anything untranslated shows in English.
+- **Languages** are built into the app (English, Hindi, Telugu, Tamil, Marathi, plus partial Haryanvi and Sanskrit layers over Hindi). English text in the code is the key, so anything untranslated shows in English.
 - **Accessibility** is checked automatically (axe on the main pages, contrast for every theme and wallpaper) but still needs a hands-on screen-reader pass.
 
 The planning above was the starting point. `PROGRESS.md` is the working log and is kept up to date; this file's top section is the summary.
