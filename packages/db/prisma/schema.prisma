@@ -1,0 +1,791 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  student
+  parent
+  teacher
+  clerk
+  principal
+  admin
+  /// Runs the platform (creates and suspends schools). Belongs to the hidden platform school.
+  superadmin
+}
+
+enum RequestStatus {
+  pending
+  approved
+  rejected
+}
+
+enum LinkStatus {
+  pending
+  approved
+  revoked
+}
+
+enum RequestKind {
+  new_account
+  role_change
+  parent_link
+}
+
+model School {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  /// The school's address: greenfield in greenfield.example.com. Null only for schools that predate it.
+  slug      String?  @unique
+  /// A suspended school cannot sign in.
+  active    Boolean  @default(true)
+  /// The hidden home of the super admin. Never listed as a school.
+  isPlatform Boolean @default(false)
+  tagline   String?
+  /// Accent colour as a hue (0 to 360), shown on the login page and across the app.
+  brandHue  Int?
+  logoKey   String?
+  logoMime  String?
+  logoUpdatedAt DateTime?
+  /// The plan this school is on. Null = no plan set, so no student limit and no expiry (schools that predate plans).
+  planId    String?
+  /// The last day the school has paid up to. Null = no expiry.
+  planEndsOn DateTime? @db.Date
+  /// Most rows a long list (students, invoices, admissions, certificates, leave) sends at once. The school's admin sets it.
+  listLimit Int      @default(500)
+
+  plan     Plan?           @relation(fields: [planId], references: [id])
+  payments SchoolPayment[]
+
+  users        User[]
+  classes      Class[]
+  roleRequests RoleRequest[]
+  links        ParentStudentLink[]
+  auditLogs    AuditLog[]
+  bulkLogs     BulkActionLog[]
+}
+
+/// What a school pays for. maxStudents 0 = unlimited.
+model Plan {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  maxStudents  Int      @default(0)
+  /// Price per month, in paise.
+  priceMonthly Int      @default(0)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  schools School[]
+}
+
+/// One payment the platform received from a school. Recording one extends the school's planEndsOn.
+model SchoolPayment {
+  id           String   @id @default(cuid())
+  schoolId     String
+  /// Paise.
+  amount       Int
+  method       String
+  reference    String?
+  months       Int
+  periodFrom   DateTime @db.Date
+  periodTo     DateTime @db.Date
+  note         String?
+  recordedById String
+  createdAt    DateTime @default(now())
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId, createdAt])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  schoolId     String
+  email        String
+  name         String
+  passwordHash String
+  phone        String?
+  mustChangePassword Boolean @default(false)
+  role         Role
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  school    School        @relation(fields: [schoolId], references: [id])
+  memberships ClassMember[]
+  asParent  ParentStudentLink[] @relation("ParentLinks")
+  asStudent ParentStudentLink[] @relation("StudentLinks")
+
+  @@unique([schoolId, email])
+  @@index([schoolId, role])
+}
+
+model Class {
+  id       String @id @default(cuid())
+  schoolId String
+  name     String
+  /// The teacher in charge of the class. Always also a member with role teacher.
+  classTeacherId String?
+  /// The student the class teacher picked as class monitor. Always also a student member.
+  monitorId      String?
+
+  school   School        @relation(fields: [schoolId], references: [id])
+  members  ClassMember[]
+  channels Channel[]
+
+  @@unique([schoolId, name])
+}
+
+model ClassMember {
+  id          String @id @default(cuid())
+  classId     String
+  userId      String
+  roleInClass Role
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, userId])
+}
+
+model Channel {
+  id      String @id @default(cuid())
+  classId String
+  type    String
+  name    String
+  /// Icon key chosen for a custom text channel; null uses the default.
+  icon    String?
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, name])
+}
+
+model ParentStudentLink {
+  id           String     @id @default(cuid())
+  schoolId     String
+  parentId     String
+  studentId    String
+  relationship String
+  status       LinkStatus @default(pending)
+  proposedById String?
+  approvedById String?
+  createdAt    DateTime   @default(now())
+
+  school  School @relation(fields: [schoolId], references: [id])
+  parent  User   @relation("ParentLinks", fields: [parentId], references: [id])
+  student User   @relation("StudentLinks", fields: [studentId], references: [id])
+
+  @@unique([parentId, studentId])
+  @@index([schoolId, status])
+}
+
+model RoleRequest {
+  id            String        @id @default(cuid())
+  schoolId      String
+  kind          RequestKind   @default(role_change)
+  targetUserId  String
+  requestedRole Role
+  status        RequestStatus @default(pending)
+  requestedById String
+  decidedById   String?
+  reason        String?
+  note          String?
+  createdAt     DateTime      @default(now())
+  decidedAt     DateTime?
+
+  school School @relation(fields: [schoolId], references: [id])
+
+  @@index([schoolId, status])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  schoolId   String
+  actorId    String
+  action     String
+  resource   String
+  resourceId String?
+  bulkId     String?
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  school School @relation(fields: [schoolId], references: [id])
+
+  @@index([schoolId, createdAt])
+}
+
+model BulkActionLog {
+  id            String   @id @default(cuid())
+  schoolId      String
+  actorId       String
+  resource      String
+  action        String
+  recordIds     String[]
+  reason        String?
+  resultSummary Json
+  createdAt     DateTime @default(now())
+
+  school School @relation(fields: [schoolId], references: [id])
+}
+
+enum AttendanceStatus {
+  present
+  absent
+  late
+  /// An approved leave day: excused, and neither attended nor missed.
+  leave
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  schoolId  String
+  classId   String?
+  authorId  String
+  title     String
+  body      String
+  urgent    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  editedAt  DateTime?
+
+  @@index([schoolId, classId, createdAt])
+}
+
+model Attendance {
+  id         String           @id @default(cuid())
+  schoolId   String
+  classId    String
+  studentId  String
+  date       DateTime         @db.Date
+  status     AttendanceStatus
+  markedById String
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([classId, studentId, date])
+  @@index([schoolId, date])
+  @@index([studentId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  schoolId  String
+  userId    String
+  event     String
+  channel   String
+  subject   String
+  body      String
+  status    String   @default("queued")
+  /// Groups related notifications (for example "dm:<conversationId>") so copies can be throttled.
+  ref       String?
+  /// Urgent ones ignore quiet hours and go first.
+  urgent    Boolean  @default(false)
+  attempts  Int      @default(0)
+  nextAttemptAt DateTime @default(now())
+  error     String?
+  sentAt    DateTime?
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model NotificationPreference {
+  id      String  @id @default(cuid())
+  userId  String
+  channel String
+  enabled Boolean @default(true)
+
+  @@unique([userId, channel])
+}
+
+/// One person's quiet hours: email and WhatsApp wait until the window ends. Urgent messages ignore it.
+model QuietHours {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  enabled   Boolean  @default(true)
+  start     String   // HH:MM, local to the timezone
+  end       String   // HH:MM
+  timezone  String   // IANA name such as Asia/Kolkata
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+/// A school's own wording for a notification. Only overrides are stored; the defaults live in code.
+model NotificationTemplate {
+  id          String   @id @default(cuid())
+  schoolId    String
+  event       String
+  variant     String   // normal | urgent
+  subject     String
+  body        String
+  updatedById String
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@unique([schoolId, event, variant])
+}
+
+model WhatsAppConsent {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  optedIn   Boolean
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  schoolId    String
+  classId     String
+  title       String
+  description String
+  dueDate     DateTime @db.Date
+  createdById String
+  createdAt   DateTime @default(now())
+
+  submissions Submission[]
+  files       HomeworkFile[]
+
+  @@index([classId, dueDate])
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+  assignmentId String
+  studentId    String
+  text         String
+  submittedAt  DateTime @default(now())
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+}
+
+/// A file on an assignment. studentId null = the teacher's attachment; otherwise that student's hand-in.
+model HomeworkFile {
+  id           String   @id @default(cuid())
+  schoolId     String
+  assignmentId String
+  studentId    String?
+  uploadedById String
+  name         String
+  mime         String
+  size         Int
+  storageKey   String   @unique
+  createdAt    DateTime @default(now())
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([assignmentId, studentId])
+}
+
+/// A document shared in a class's resources channel.
+model ResourceFile {
+  id           String   @id @default(cuid())
+  schoolId     String
+  classId      String
+  uploadedById String
+  name         String
+  mime         String
+  size         Int
+  storageKey   String   @unique
+  createdAt    DateTime @default(now())
+
+  @@index([classId, createdAt])
+}
+
+model AcademicYear {
+  id        String   @id @default(cuid())
+  schoolId  String
+  name      String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  /// At most one year per school is current.
+  current   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  terms Term[]
+
+  @@unique([schoolId, name])
+}
+
+model Term {
+  id        String   @id @default(cuid())
+  schoolId  String
+  yearId    String
+  name      String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+
+  year AcademicYear @relation(fields: [yearId], references: [id], onDelete: Cascade)
+
+  @@unique([yearId, name])
+  @@index([schoolId, startDate])
+}
+
+/// One row per grade: a percentage at or above minPercent (and below the next band up) earns this grade. No rows = the built-in scale.
+model GradeBand {
+  id         String @id @default(cuid())
+  schoolId   String
+  minPercent Float
+  grade      String
+
+  @@unique([schoolId, grade])
+  @@unique([schoolId, minPercent])
+}
+
+/// A school-wide document (forms, circulars, policies) that everyone in the school can download.
+model SchoolDocument {
+  id           String   @id @default(cuid())
+  schoolId     String
+  uploadedById String
+  title        String
+  name         String
+  mime         String
+  size         Int
+  storageKey   String   @unique
+  createdAt    DateTime @default(now())
+
+  @@index([schoolId, createdAt])
+}
+
+model TimetableSlot {
+  id        String  @id @default(cuid())
+  schoolId  String
+  classId   String
+  dayOfWeek Int
+  period    Int
+  startTime String
+  endTime   String
+  subject   String
+  teacherId String?
+
+  @@unique([classId, dayOfWeek, period])
+  @@index([teacherId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  schoolId  String
+  classId   String
+  senderId  String
+  body      String
+  /// null = the class's main chat channel; otherwise a custom text channel.
+  channelId String?
+  createdAt DateTime @default(now())
+
+  @@index([classId, createdAt])
+  @@index([channelId, createdAt])
+}
+
+enum ExamStatus {
+  draft
+  submitted
+  approved
+  rejected
+}
+
+model Exam {
+  id          String     @id @default(cuid())
+  schoolId    String
+  classId     String
+  name        String
+  subject     String
+  maxMarks    Float
+  date        DateTime   @db.Date
+  status      ExamStatus @default(draft)
+  createdById String
+  submittedAt DateTime?
+  decidedById String?
+  decidedAt   DateTime?
+  reason      String?
+  termId      String?
+  createdAt   DateTime   @default(now())
+
+  marks Mark[]
+
+  @@index([schoolId, status])
+  @@index([classId])
+}
+
+model Mark {
+  id        String  @id @default(cuid())
+  examId    String
+  studentId String
+  score     Float?
+  absent    Boolean @default(false)
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, studentId])
+  @@index([studentId])
+}
+
+model Admission {
+  id            String        @id @default(cuid())
+  schoolId      String
+  classId       String
+  studentName   String
+  studentEmail  String
+  parentName    String
+  parentEmail   String
+  parentPhone   String?
+  relationship  String        @default("parent")
+  whatsappOptIn Boolean       @default(false)
+  status        RequestStatus @default(pending)
+  createdById   String
+  decidedById   String?
+  decidedAt     DateTime?
+  reason        String?
+  studentUserId String?
+  createdAt     DateTime      @default(now())
+
+  @@unique([schoolId, studentEmail])
+  @@index([schoolId, status])
+}
+
+model Invoice {
+  id             String    @id @default(cuid())
+  schoolId       String
+  studentId      String
+  classId        String
+  title          String
+  amount         Int
+  dueDate        DateTime  @db.Date
+  status         String    @default("unpaid")
+  waiverStatus   String    @default("none")
+  waiverReason   String?
+  waiverNote     String?
+  waiverDecidedById String?
+  razorpayOrderId String?
+  createdById    String
+  createdAt      DateTime  @default(now())
+
+  payments Payment[]
+
+  @@index([schoolId, status])
+  @@index([studentId])
+  @@index([classId])
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  invoiceId         String
+  amount            Int
+  method            String
+  reference         String?
+  razorpayPaymentId String?  @unique
+  recordedById      String
+  paidAt            DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+/// One row per reminder sent, so a fee is never nagged twice for the same stage.
+model FeeReminder {
+  id        String   @id @default(cuid())
+  schoolId  String
+  invoiceId String
+  kind      String   // due | overdue
+  sentAt    DateTime @default(now())
+
+  @@index([invoiceId, kind, sentAt])
+}
+
+/// A full refund of a paid invoice. Online payments are refunded through Razorpay; the rest are handed back by the office.
+model Refund {
+  id               String   @id @default(cuid())
+  schoolId         String
+  invoiceId        String
+  paymentId        String
+  amount           Int
+  reason           String
+  method           String   // razorpay | manual
+  razorpayRefundId String?  @unique
+  status           String   // processed | pending | failed
+  createdById      String
+  createdAt        DateTime @default(now())
+
+  @@index([invoiceId])
+}
+
+/// A student's photo for the ID card. The file is in storage; only the key and type are kept here.
+model StudentPhoto {
+  studentId   String   @id
+  schoolId    String
+  storageKey  String   @unique
+  mime        String
+  size        Int
+  updatedById String
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  schoolId    String
+  studentId   String
+  type        String
+  number      String
+  issuedById  String
+  issuedAt    DateTime @default(now())
+
+  @@unique([schoolId, number])
+  @@index([studentId])
+}
+
+model LeaveRequest {
+  id            String        @id @default(cuid())
+  schoolId      String
+  requesterId   String
+  subjectUserId String
+  fromDate      DateTime      @db.Date
+  toDate        DateTime      @db.Date
+  reason        String
+  status        RequestStatus @default(pending)
+  decidedById   String?
+  decidedAt     DateTime?
+  decisionNote  String?
+  createdAt     DateTime      @default(now())
+  messages      LeaveMessage[]
+
+  @@index([schoolId, status])
+  @@index([requesterId])
+  @@index([subjectUserId])
+}
+
+/// A conversation on a leave request between the requester side and the approvers.
+model LeaveMessage {
+  id        String   @id @default(cuid())
+  schoolId  String
+  leaveId   String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  leave LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+
+  @@index([leaveId, createdAt])
+}
+
+model VoiceChannel {
+  id          String   @id @default(cuid())
+  schoolId    String
+  classId     String
+  name        String
+  createdById String
+  createdAt   DateTime @default(now())
+
+  notes VoiceNote[]
+
+  @@unique([classId, name])
+  @@index([schoolId])
+}
+
+model VoiceNote {
+  id        String   @id @default(cuid())
+  channelId String
+  userId    String
+  body      String   @default("")
+  updatedAt DateTime @updatedAt
+
+  channel VoiceChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+}
+
+/// One private conversation between two people. The pair is stored in a fixed order (userAId < userBId) so it is unique.
+model Conversation {
+  id            String   @id @default(cuid())
+  schoolId      String
+  userAId       String
+  userBId       String
+  createdAt     DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+
+  messages DirectMessage[]
+  reads    ConversationRead[]
+
+  @@unique([userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
+}
+
+model DirectMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String
+  createdAt      DateTime @default(now())
+  editedAt       DateTime?
+  /// Set when the sender deletes it: the text and files are removed, a placeholder stays so the thread still reads properly.
+  deletedAt      DateTime?
+  /// The child a message is about, so a parent's message says who it concerns.
+  aboutStudentId String?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  attachments  DmAttachment[]
+
+  @@index([conversationId, createdAt])
+}
+
+/// A file sent in a conversation. messageId stays null until the message is sent.
+model DmAttachment {
+  id             String   @id @default(cuid())
+  schoolId       String
+  conversationId String
+  messageId      String?
+  uploaderId     String
+  name           String
+  mime           String
+  size           Int
+  storageKey     String
+  createdAt      DateTime @default(now())
+
+  message DirectMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([conversationId])
+}
+
+/// One person has stopped the other from messaging them (and cannot message them until they unblock).
+model MessageBlock {
+  id        String   @id @default(cuid())
+  schoolId  String
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockedId])
+}
+
+/// A complaint about a message or a conversation. Filing one lets the school read that conversation, and nothing else.
+model MessageReport {
+  id             String    @id @default(cuid())
+  schoolId       String
+  conversationId String
+  messageId      String?
+  reporterId     String
+  reportedUserId String
+  reason         String
+  status         String    @default("open") // open | reviewed | dismissed
+  reviewedById   String?
+  reviewNote     String?
+  reviewedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([conversationId])
+}
+
+model ConversationRead {
+  id             String   @id @default(cuid())
+  conversationId String
+  userId         String
+  readAt         DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}

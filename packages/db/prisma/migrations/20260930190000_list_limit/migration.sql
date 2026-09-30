@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "School" ADD COLUMN     "listLimit" INTEGER NOT NULL DEFAULT 500;

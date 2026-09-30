@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 72% 46%; /* 5.6:1 with white text, and as red text on white */
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5% 56%; /* form-control outline: 3:1 against the page (WCAG 1.4.11); --border stays soft for dividers */
+    --ring: 240 5.9% 10%;
+    --radius: 0.625rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 4% 42%;
+    --ring: 240 4.9% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+/* Wallpaper: a fixed picture behind the app, softened by the page colour so text stays readable. */
+.wallpaper-layer { display: none; }
+[data-wallpaper] .wallpaper-layer {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--wallpaper);
+  pointer-events: none;
+}
+[data-wallpaper] .wallpaper-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--background));
+  opacity: var(--wallpaper-dim, 0.55);
+}
+[data-wallpaper] .app-root { background: transparent; }
+[data-wallpaper] .app-root .bg-card { background-color: hsl(var(--card) / 0.72); backdrop-filter: blur(12px); }
+[data-wallpaper] .app-root .bg-muted\/50 { background-color: hsl(var(--muted) / 0.6); backdrop-filter: blur(12px); }
+
+/* Native <select> popups: follow the active theme (including custom colour themes) so options stay readable. */
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
+select option,
+select optgroup {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+}
+select option:disabled { color: hsl(var(--muted-foreground)); }
+
+/* Tables on phones: each row becomes a card, each cell shows its column heading. */
+@media (max-width: 639px) {
+  [data-slot="table-container"] { overflow: visible; border: 0; background: transparent; border-radius: 0; }
+  table[data-stack], table[data-stack] tbody { display: block; width: 100%; }
+  table[data-stack] thead:not(:has([role="checkbox"])) { display: none; }
+  table[data-stack] thead, table[data-stack] thead tr { display: block; border: 0; background: transparent; }
+  table[data-stack] thead th { display: none; height: auto; padding: 0 0.25rem 0.5rem; }
+  /* Keep "select all" reachable for bulk actions. */
+  table[data-stack] thead th:has([role="checkbox"]) { display: flex; align-items: center; gap: 0.5rem; }
+  table[data-stack] thead th:has([role="checkbox"])::after { content: "Select all"; font-size: 0.8rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
+  table[data-stack] tbody tr {
+    display: block; margin-bottom: 0.75rem; padding: 0.25rem 0;
+    border: 1px solid hsl(var(--border)); border-radius: 0.75rem; background: hsl(var(--card));
+  }
+  table[data-stack] tbody tr:last-child { border-bottom: 1px solid hsl(var(--border)); }
+  table[data-stack] tbody td {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    width: 100%; padding: 0.4rem 0.9rem; border: 0; text-align: right; white-space: normal !important;
+  }
+  table[data-stack] tbody td::before {
+    content: attr(data-label); flex-shrink: 0; max-width: 45%; text-align: left;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: hsl(var(--muted-foreground));
+  }
+  table[data-stack] tbody td[data-label=""]::before { content: none; }
+  table[data-stack] tbody td:has(> [data-slot="cell-content"]:empty) { display: none; }
+}
+
+/* Red text on dark backgrounds: the dark destructive colour is meant for button fills, so text uses a lighter red (6:1). */
+.dark .text-destructive { color: hsl(0 84% 66%); }

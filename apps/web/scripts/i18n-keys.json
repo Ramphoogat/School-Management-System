@@ -1,0 +1,3443 @@
+{
+  ". Their menu and access change straight away.": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "· edited": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "(its own sign-in link)": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "(no subject)": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "(not offered)": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "(not set up yet)": {
+    "count": 1,
+    "files": [
+      "components\\ChannelPicker.tsx"
+    ]
+  },
+  "(optional, with country code)": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "(optional)": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "(shown under the name on the sign-in page)": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "(the principal, or the admin if the principal is one of the two people). Nothing else of yours is opened. While it is open, messages here can't be edited or deleted.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "(you)": {
+    "count": 2,
+    "files": [
+      "components\\MembersPanel.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "). The principal decides.": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "{count}selected": {
+    "count": 1,
+    "files": [
+      "components\\BulkSelectionBar.tsx"
+    ]
+  },
+  "{date}· out of {maxMarks}": {
+    "count": 1,
+    "files": [
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "{length}fee(s)": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "{overallPercent}% · Grade {overallGrade}": {
+    "count": 1,
+    "files": [
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "{people}people · {students}students · {teachers}teachers": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "{r}s": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "{startDate}to {endDate}": {
+    "count": 2,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "{succeeded}of {total}succeeded. Not processed:": {
+    "count": 2,
+    "files": [
+      "pages\\Approvals.tsx",
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "{value}· tap to download": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "{value}/ month": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "{value}is typing…": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "% is": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "A mark earns the grade of the highest band whose minimum it reaches. One band must start at 0. Changing the scale updates every report card.": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "A plan sets how many students a school can have and what it pays each month. Give a plan to a school from its Manage panel. Schools with no plan have no limit.": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "A score is outside 0 to {maxMarks}.": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "About": {
+    "count": 2,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Absent": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Academic year and grades": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Academic years and terms": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Accent colour": {
+    "count": 4,
+    "files": [
+      "components\\HueSlider.tsx",
+      "pages\\Branding.tsx",
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Action": {
+    "count": 1,
+    "files": [
+      "pages\\Simple.tsx"
+    ]
+  },
+  "Active": {
+    "count": 3,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Active and deactivated": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Add": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Add a phone number to receive WhatsApp messages.": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Add a school": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Add admin": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Add another admin": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Add application": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Add band": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Add period": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Add plan": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Add school": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Add to this class": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "Add user": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Address": {
+    "count": 2,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Admins": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Admissions": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "All classes": {
+    "count": 2,
+    "files": [
+      "pages\\Fees.tsx",
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "All roles": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "All statuses": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Also teaches on {value}: {value2}": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Amount": {
+    "count": 3,
+    "files": [
+      "pages\\Fees.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "Amount (₹)": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Amount ₹": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Amount to refund in rupees. Leave empty to refund all": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Announcement deleted": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Announcement posted": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Announcement updated": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Appearance: theme, wallpaper, light / dark": {
+    "count": 1,
+    "files": [
+      "components\\CommandBar.tsx"
+    ]
+  },
+  "Application added for approval": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "approvals center": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Approvals center": {
+    "count": 1,
+    "files": [
+      "pages\\ApprovalsCenter.tsx"
+    ]
+  },
+  "Approve": {
+    "count": 6,
+    "files": [
+      "components\\LeavePanel.tsx",
+      "pages\\Admissions.tsx",
+      "pages\\Approvals.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Manage.tsx",
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "Approve waiver": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Approved leave today": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Approved results only": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Assign homework": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Assign to classes": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Attach a file": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Attach a file (PDF, image, Word, text; up to 10 MB)": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Attendance, last 14 days": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Audit log": {
+    "count": 1,
+    "files": [
+      "pages\\Simple.tsx"
+    ]
+  },
+  "Average result by subject": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Back": {
+    "count": 2,
+    "files": [
+      "pages\\IdCards.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "Back to messages": {
+    "count": 2,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Back to the default": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Back to the standard scale": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "below.": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Between": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Bulk": {
+    "count": 1,
+    "files": [
+      "pages\\Simple.tsx"
+    ]
+  },
+  "Calculator": {
+    "count": 3,
+    "files": [
+      "components\\Calculator.tsx",
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Calls are for up to {max}people. Your microphone and camera stay off until you turn them on.": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Cancel": {
+    "count": 22,
+    "files": [
+      "components\\ClassMembersPanel.tsx",
+      "components\\CreateChannelDialog.tsx",
+      "components\\PhotoCropDialog.tsx",
+      "pages\\Admissions.tsx",
+      "pages\\Approvals.tsx",
+      "pages\\Channels.tsx",
+      "pages\\Exams.tsx",
+      "pages\\Fees.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Messages.tsx",
+      "pages\\Platform.tsx",
+      "pages\\PlatformBilling.tsx",
+      "pages\\Records.tsx",
+      "pages\\ResultApprovals.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Certificates": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Change password": {
+    "count": 2,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Change role": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Change role for {name}": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Changed": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Changes apply to every school on this plan straight away.": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Changing it changes the school's sign-in link. Tell them if you do.": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Channel": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Channel created": {
+    "count": 1,
+    "files": [
+      "components\\CreateChannelDialog.tsx"
+    ]
+  },
+  "Channel deleted": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Channel icon": {
+    "count": 1,
+    "files": [
+      "components\\CreateChannelDialog.tsx"
+    ]
+  },
+  "Channel name": {
+    "count": 1,
+    "files": [
+      "components\\CreateChannelDialog.tsx"
+    ]
+  },
+  "Channels": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Child": {
+    "count": 1,
+    "files": [
+      "components\\AttendanceCalendar.tsx"
+    ]
+  },
+  "Choose a conversation, or start a new one.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Choose a date to see what happened that day.": {
+    "count": 1,
+    "files": [
+      "components\\AttendanceCalendar.tsx"
+    ]
+  },
+  "Choose which child this message is about": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Choose who you want to write to.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Class": {
+    "count": 7,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\IdCards.tsx",
+      "pages\\Manage.tsx",
+      "pages\\Records.tsx",
+      "pages\\ResultApprovals.tsx",
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Class created": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Class monitor": {
+    "count": 3,
+    "files": [
+      "components\\ClassMembersPanel.tsx",
+      "components\\MembersPanel.tsx"
+    ]
+  },
+  "Class teacher": {
+    "count": 4,
+    "files": [
+      "components\\ClassMembersPanel.tsx",
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Class:": {
+    "count": 1,
+    "files": [
+      "pages\\IdCards.tsx"
+    ]
+  },
+  "Clear": {
+    "count": 1,
+    "files": [
+      "components\\BulkSelectionBar.tsx"
+    ]
+  },
+  "Click the calculator, then type numbers and + − * / Enter": {
+    "count": 1,
+    "files": [
+      "components\\Calculator.tsx"
+    ]
+  },
+  "Click to add a detail that is filled in for each person:": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Close": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Columns: email, score (use AB for absent)": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Columns: studentName, studentEmail, parentName, parentEmail, parentPhone, relationship, class, whatsappOptIn (yes/no)": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Command bar": {
+    "count": 1,
+    "files": [
+      "components\\CommandBar.tsx"
+    ]
+  },
+  "Confirm delete": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Connecting…": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Conversation options": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Conversations that someone reported. You can read only these, and each time you open one it is recorded in the audit log.": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Copied": {
+    "count": 2,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Copy": {
+    "count": 2,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Copy a day": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Copy a day…": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Could not copy. Select it and copy by hand.": {
+    "count": 2,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Country code": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Create": {
+    "count": 2,
+    "files": [
+      "pages\\Manage.tsx",
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Create channel": {
+    "count": 1,
+    "files": [
+      "components\\CreateChannelDialog.tsx"
+    ]
+  },
+  "Create exam": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Create invoices for class": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Current": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Current password": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Currently": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Date": {
+    "count": 1,
+    "files": [
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "Dates": {
+    "count": 1,
+    "files": [
+      "pages\\Leave.tsx"
+    ]
+  },
+  "Day": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Days recorded": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Deactivate": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Deactivated": {
+    "count": 3,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Decision note": {
+    "count": 2,
+    "files": [
+      "components\\LeavePanel.tsx",
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Decision: {waiverNote}": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Decline": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Delete": {
+    "count": 4,
+    "files": [
+      "pages\\Channels.tsx",
+      "pages\\Exams.tsx",
+      "pages\\Messages.tsx",
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Delete {name}?": {
+    "count": 2,
+    "files": [
+      "pages\\Exams.tsx",
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Delete school…": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Delete this message for both of you? This cannot be undone.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Delete this school": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Deleted by the sender": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Deleting is permanent, so a school has to be suspended first. Suspend it from the schools list, then come back here.": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Delivery log": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Detail": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Details": {
+    "count": 2,
+    "files": [
+      "pages\\Fees.tsx",
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Details saved": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Document published": {
+    "count": 1,
+    "files": [
+      "pages\\Documents.tsx"
+    ]
+  },
+  "Documents": {
+    "count": 1,
+    "files": [
+      "pages\\Documents.tsx"
+    ]
+  },
+  "Done": {
+    "count": 3,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\Timetable.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Download CSV": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Download PDF": {
+    "count": 2,
+    "files": [
+      "pages\\Records.tsx",
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "Download template": {
+    "count": 2,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Drag to position the face inside the frame, and use the slider to zoom.": {
+    "count": 1,
+    "files": [
+      "components\\PhotoCropDialog.tsx"
+    ]
+  },
+  "Due": {
+    "count": 2,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Due {dueDate}": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "e.g. Grade 9-B": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "e.g. Learning together": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "Edit": {
+    "count": 3,
+    "files": [
+      "pages\\Channels.tsx",
+      "pages\\Messages.tsx",
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Edit details": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Edit plan": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Edit timetable": {
+    "count": 2,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Email": {
+    "count": 5,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "End time": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Everyone at this school is signed out straight away and cannot sign in until you reactivate it. Nothing is deleted.": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Everything this school owns is erased for good. To confirm, type": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Exam": {
+    "count": 2,
+    "files": [
+      "pages\\ReportCard.tsx",
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "Exam created. Enter the marks below.": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Exam deleted": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Exam name (e.g. Unit Test 1)": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Export CSV": {
+    "count": 4,
+    "files": [
+      "pages\\Channels.tsx",
+      "pages\\Fees.tsx",
+      "pages\\Records.tsx",
+      "pages\\Simple.tsx"
+    ]
+  },
+  "Fee": {
+    "count": 3,
+    "files": [
+      "pages\\Fees.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "Fee structure for {name}": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Fee title (e.g. Term 1)": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Fee waivers": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Fees": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "File shared": {
+    "count": 1,
+    "files": [
+      "components\\Resources.tsx"
+    ]
+  },
+  "Files": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Filter by class": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Filter by role": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Filter by status": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "First admin's email": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "First admin's name": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "For": {
+    "count": 1,
+    "files": [
+      "pages\\Leave.tsx"
+    ]
+  },
+  "Forms, circulars and policies from the school office.": {
+    "count": 1,
+    "files": [
+      "pages\\Documents.tsx"
+    ]
+  },
+  "From": {
+    "count": 4,
+    "files": [
+      "pages\\Academic.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Full amount": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Full name": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Give these sign-in details to {name}. The password is shown only once.": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Give these sign-in details to {name}. This password is shown only once.": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Go back to the default wording for this message?": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Grade": {
+    "count": 2,
+    "files": [
+      "pages\\Academic.tsx",
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "Grade scale": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Grade scale saved": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Has urgent wording": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Hasn't set a password yet": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Hold email and WhatsApp during quiet hours": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Home": {
+    "count": 1,
+    "files": [
+      "components\\CommandBar.tsx"
+    ]
+  },
+  "Homework": {
+    "count": 1,
+    "files": [
+      "components\\AttendanceCalendar.tsx"
+    ]
+  },
+  "How you want to be notified": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "How your school looks on the sign-in page and across the app.": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "I agree to receive school messages on WhatsApp": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Icon": {
+    "count": 1,
+    "files": [
+      "components\\CreateChannelDialog.tsx"
+    ]
+  },
+  "ID cards": {
+    "count": 1,
+    "files": [
+      "pages\\IdCards.tsx"
+    ]
+  },
+  "Import CSV": {
+    "count": 2,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Exams.tsx"
+    ]
+  },
+  "in {name}": {
+    "count": 1,
+    "files": [
+      "components\\CreateChannelDialog.tsx"
+    ]
+  },
+  "Instructions": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Issue certificates": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Issued": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "It pays for the months after the school is currently paid up to, or from today if that has passed.": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Leave": {
+    "count": 2,
+    "files": [
+      "pages\\Leave.tsx",
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Leave request": {
+    "count": 2,
+    "files": [
+      "components\\AttendanceCalendar.tsx",
+      "components\\LeavePanel.tsx"
+    ]
+  },
+  "Leave request sent": {
+    "count": 1,
+    "files": [
+      "pages\\Leave.tsx"
+    ]
+  },
+  "Leave without saving?": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Link proposed for approval": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Listening only. Turn on the mic to talk.": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Load earlier messages": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Loading fees…": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Loading members…": {
+    "count": 1,
+    "files": [
+      "components\\MembersPanel.tsx"
+    ]
+  },
+  "Loading plan…": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Loading…": {
+    "count": 21,
+    "files": [
+      "App.tsx",
+      "components\\AttendanceCalendar.tsx",
+      "components\\PhotoCropDialog.tsx",
+      "components\\Resources.tsx",
+      "pages\\Analytics.tsx",
+      "pages\\Approvals.tsx",
+      "pages\\ApprovalsCenter.tsx",
+      "pages\\Branding.tsx",
+      "pages\\Channels.tsx",
+      "pages\\Documents.tsx",
+      "pages\\Exams.tsx",
+      "pages\\MessageReports.tsx",
+      "pages\\Messages.tsx",
+      "pages\\NotificationTemplates.tsx",
+      "pages\\Records.tsx",
+      "pages\\ResultApprovals.tsx",
+      "pages\\Timetable.tsx",
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Logo": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "Logo removed": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "Logo updated": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "Looking for things that need a decision? Open the": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Make current": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Manage": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Mark {size}invoice(s) paid?": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Mark absent": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Mark as urgent": {
+    "count": 2,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Mark late": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Mark paid": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Mark present": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Mark reviewed": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Marked": {
+    "count": 1,
+    "files": [
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "Maximum marks": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Members": {
+    "count": 2,
+    "files": [
+      "pages\\Channels.tsx",
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Message": {
+    "count": 3,
+    "files": [
+      "pages\\Channels.tsx",
+      "pages\\Messages.tsx",
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Message not sent": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Message options": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Message reports": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Message templates": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Message the class…": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Messages": {
+    "count": 2,
+    "files": [
+      "components\\AttendanceCalendar.tsx",
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Messages that arrive in this time are sent when it ends. Alerts inside the app still appear straight away, and urgent messages (such as an urgent announcement or a long-overdue fee) always come through.": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Method": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Microphone and camera need a secure (https) connection. You can still listen.": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Minimum percent": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Missing": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Monitor": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "Months": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Mute": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "My notes": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "My requests": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "My teaching schedule": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Name": {
+    "count": 5,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Platform.tsx",
+      "pages\\PlatformBilling.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Needs action": {
+    "count": 1,
+    "files": [
+      "pages\\ApprovalsCenter.tsx"
+    ]
+  },
+  "New": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "New accounts created": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "New exams join the term their date falls in, so report cards can be shown one term at a time.": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "New message": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "New password (8+ characters)": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "New role": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "New voice channel, e.g. Study room 1": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Next month": {
+    "count": 1,
+    "files": [
+      "components\\AttendanceCalendar.tsx"
+    ]
+  },
+  "No": {
+    "count": 2,
+    "files": [
+      "pages\\Records.tsx",
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "No {status}reports.": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "No {status}role requests. Requests submitted by clerks and teachers appear here for approval.": {
+    "count": 1,
+    "files": [
+      "pages\\Approvals.tsx"
+    ]
+  },
+  "No academic year yet. Add the first one above.": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "No action needed": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "No admins yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "No announcements yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "No approved parent link": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "No approved results yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "No attendance has been marked in the last 14 days.": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "No certificates issued yet. Ask the school office to issue one.": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "No class monitor": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "No class teacher": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "No conversations yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "No documents yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Documents.tsx"
+    ]
+  },
+  "No email or WhatsApp messages yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "No fees for {name}yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "No files shared yet.": {
+    "count": 1,
+    "files": [
+      "components\\Resources.tsx"
+    ]
+  },
+  "No homework yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "No linked children yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "No linked student yet. A clerk proposes the link and the principal or admin approves it.": {
+    "count": 1,
+    "files": [
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "No links yet. A parent only sees a child’s data after an approved link.": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "No members in this class yet.": {
+    "count": 1,
+    "files": [
+      "components\\MembersPanel.tsx"
+    ]
+  },
+  "No messages from the school on this day.": {
+    "count": 1,
+    "files": [
+      "components\\AttendanceCalendar.tsx"
+    ]
+  },
+  "No messages yet. Ask a question or add details here.": {
+    "count": 1,
+    "files": [
+      "components\\LeavePanel.tsx"
+    ]
+  },
+  "No messages yet. Say hello to {value}.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "No messages yet. Say hello to your class.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "No monitor": {
+    "count": 1,
+    "files": [
+      "components\\MembersPanel.tsx"
+    ]
+  },
+  "No one matches.": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "No periods yet. Use “Add period” to start this class’s week.": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "No plan (no limits)": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "No schools yet. Add the first one.": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "No students are below 75%.": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "No students are enrolled in this class yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "No students found.": {
+    "count": 2,
+    "files": [
+      "pages\\IdCards.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "No students yet.": {
+    "count": 2,
+    "files": [
+      "components\\ClassMembersPanel.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "No teacher": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "No teachers yet.": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "No voice channels yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Not assigned": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Not available here: {value}. Use only the details above.": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Not generated:": {
+    "count": 1,
+    "files": [
+      "pages\\IdCards.tsx"
+    ]
+  },
+  "Not issued:": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Not processed:": {
+    "count": 4,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Fees.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "not yet saved": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Note": {
+    "count": 2,
+    "files": [
+      "components\\AttendanceCalendar.tsx",
+      "pages\\Approvals.tsx"
+    ]
+  },
+  "Note (optional)": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Note (required)": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Note for the record (the person who reported sees it)": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Nothing matches. Try a class name or a page like “fees”.": {
+    "count": 1,
+    "files": [
+      "components\\CommandBar.tsx"
+    ]
+  },
+  "Notification settings": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Number": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "One teacher can take several classes. Teachers already booked at that day and time are greyed out, and their other classes that day are shown under the row.": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Open": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Overall: {totalScore}/ {totalMax}": {
+    "count": 1,
+    "files": [
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "Overdue": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Paid": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Paid up to": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Parent": {
+    "count": 2,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Parent agreed to WhatsApp messages": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Parent email (login)": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Parent name": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Parent phone (+91…)": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Parent–student links": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Parent…": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Parents": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Password changed": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Pay at the school office": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Pay online": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Payment received. A receipt is on its way.": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "PDF": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "PDF, images, Word or text, up to 10 MB": {
+    "count": 2,
+    "files": [
+      "components\\Resources.tsx",
+      "pages\\Documents.tsx"
+    ]
+  },
+  "People are not sent this again. It shows as edited.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Percent present each day (days with no marks are blank)": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Period": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Period {period}": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Permanently removes the school and everything in it: people, classes, records, messages and files. This cannot be undone. Ask the school to export its data first if it needs a copy.": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Phone": {
+    "count": 2,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Phone number": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Phone with country code, e.g. +91 98765 43210": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Photo": {
+    "count": 1,
+    "files": [
+      "pages\\IdCards.tsx"
+    ]
+  },
+  "Photo for {name}": {
+    "count": 1,
+    "files": [
+      "components\\PhotoCropDialog.tsx"
+    ]
+  },
+  "Photo preview. Drag to move it.": {
+    "count": 1,
+    "files": [
+      "components\\PhotoCropDialog.tsx"
+    ]
+  },
+  "Plan": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Plan and billing": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Plan name": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Plan saved": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Plans": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "PNG or JPG, up to 500 KB. A square picture on a plain background works best.": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "Post": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Present": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Preview of your sign-in page": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "Preview with example details": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Previous month": {
+    "count": 1,
+    "files": [
+      "components\\AttendanceCalendar.tsx"
+    ]
+  },
+  "Price per month (₹)": {
+    "count": 2,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Principal": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Print": {
+    "count": 2,
+    "files": [
+      "pages\\Records.tsx",
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "Print {length}card(s)": {
+    "count": 1,
+    "files": [
+      "pages\\IdCards.tsx"
+    ]
+  },
+  "Propose link": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Quiet hours": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Quiet hours saved": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Reactivate": {
+    "count": 2,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Reason": {
+    "count": 4,
+    "files": [
+      "pages\\Leave.tsx",
+      "pages\\MessageReports.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "Reason (required)": {
+    "count": 3,
+    "files": [
+      "pages\\Exams.tsx",
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Record a payment received": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Record payment": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Reference": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Reference (optional)": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Refresh": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Refund": {
+    "count": 2,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Refunded": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Reject": {
+    "count": 4,
+    "files": [
+      "components\\LeavePanel.tsx",
+      "pages\\Admissions.tsx",
+      "pages\\Approvals.tsx",
+      "pages\\Leave.tsx"
+    ]
+  },
+  "Relationship": {
+    "count": 2,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Remind students and parents about fees due soon or overdue. Runs by itself every day; nothing is sent twice.": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Remove": {
+    "count": 4,
+    "files": [
+      "components\\ClassMembersPanel.tsx",
+      "pages\\Branding.tsx",
+      "pages\\IdCards.tsx",
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Remove {name}from {name2}?": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "Remove band": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Remove from call": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Report card": {
+    "count": 1,
+    "files": [
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "Report conversation": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Report message": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "reported": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Reported": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Reported conversation": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "Reported. The school will look at it.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Reporting lets the school's reviewer read": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Request a fee waiver": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Request a role change": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Request submitted for approval": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Request waiver": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Requested by": {
+    "count": 1,
+    "files": [
+      "pages\\Approvals.tsx"
+    ]
+  },
+  "Requested role": {
+    "count": 1,
+    "files": [
+      "pages\\Approvals.tsx"
+    ]
+  },
+  "Requesters are notified.": {
+    "count": 1,
+    "files": [
+      "pages\\Leave.tsx"
+    ]
+  },
+  "Reset password": {
+    "count": 2,
+    "files": [
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Resource": {
+    "count": 1,
+    "files": [
+      "pages\\Simple.tsx"
+    ]
+  },
+  "Result approvals": {
+    "count": 1,
+    "files": [
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "results. Teachers submit exam marks here for approval; students and parents see them once approved.": {
+    "count": 1,
+    "files": [
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "Revoke": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Role": {
+    "count": 4,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Manage.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Role approvals": {
+    "count": 1,
+    "files": [
+      "pages\\Approvals.tsx"
+    ]
+  },
+  "Save": {
+    "count": 5,
+    "files": [
+      "pages\\Channels.tsx",
+      "pages\\Messages.tsx",
+      "pages\\PlatformBilling.tsx",
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Save and submit for approval": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Save draft": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Save scale": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Saved": {
+    "count": 3,
+    "files": [
+      "pages\\Branding.tsx",
+      "pages\\Platform.tsx",
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Saved. New messages use this wording.": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "School branding": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "School logo": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "School name": {
+    "count": 2,
+    "files": [
+      "pages\\Branding.tsx",
+      "pages\\Platform.tsx"
+    ]
+  },
+  "School overview": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Schools": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Score": {
+    "count": 1,
+    "files": [
+      "pages\\ReportCard.tsx"
+    ]
+  },
+  "Score / {maxMarks}": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Search by name": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Search by name or email": {
+    "count": 2,
+    "files": [
+      "pages\\IdCards.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "Search name, email or phone": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Search pages, classes, people…": {
+    "count": 1,
+    "files": [
+      "components\\CommandBar.tsx"
+    ]
+  },
+  "Seen": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Select all": {
+    "count": 8,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Approvals.tsx",
+      "pages\\Channels.tsx",
+      "pages\\IdCards.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Records.tsx",
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "Select all shown": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "Select all unpaid": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Select row": {
+    "count": 6,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Approvals.tsx",
+      "pages\\Fees.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Records.tsx",
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "Select students, generate their cards, then print the sheet.": {
+    "count": 1,
+    "files": [
+      "pages\\IdCards.tsx"
+    ]
+  },
+  "Select user…": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Send": {
+    "count": 3,
+    "files": [
+      "components\\LeavePanel.tsx",
+      "pages\\Channels.tsx",
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Send back": {
+    "count": 1,
+    "files": [
+      "pages\\ResultApprovals.tsx"
+    ]
+  },
+  "Send request": {
+    "count": 2,
+    "files": [
+      "pages\\Fees.tsx",
+      "pages\\Leave.tsx"
+    ]
+  },
+  "Send via": {
+    "count": 1,
+    "files": [
+      "components\\ChannelPicker.tsx"
+    ]
+  },
+  "Sent": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Sent back by the principal: {reason}": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Sign out": {
+    "count": 1,
+    "files": [
+      "components\\CommandBar.tsx"
+    ]
+  },
+  "Sign-in address": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Sign-in page": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "speaking": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Standard": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Start one": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Start time": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Status": {
+    "count": 13,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Approvals.tsx",
+      "pages\\Channels.tsx",
+      "pages\\Fees.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Manage.tsx",
+      "pages\\MessageReports.tsx",
+      "pages\\ResultApprovals.tsx",
+      "pages\\Settings.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Student": {
+    "count": 12,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Analytics.tsx",
+      "pages\\Channels.tsx",
+      "pages\\Exams.tsx",
+      "pages\\Fees.tsx",
+      "pages\\IdCards.tsx",
+      "pages\\Manage.tsx",
+      "pages\\Records.tsx"
+    ]
+  },
+  "Student email (login)": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Student limit (0 = unlimited)": {
+    "count": 2,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Student name": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "Student…": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "students": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Students": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Students ({length})": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "Students with low attendance": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Subject": {
+    "count": 6,
+    "files": [
+      "pages\\Exams.tsx",
+      "pages\\NotificationTemplates.tsx",
+      "pages\\ReportCard.tsx",
+      "pages\\Settings.tsx",
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Submit request": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Submitted": {
+    "count": 2,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Submitted {value}": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Submitted for approval": {
+    "count": 1,
+    "files": [
+      "pages\\Exams.tsx"
+    ]
+  },
+  "Suspend": {
+    "count": 2,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Suspend {name}?": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Suspended": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Tagline": {
+    "count": 3,
+    "files": [
+      "pages\\Branding.tsx",
+      "pages\\Platform.tsx"
+    ]
+  },
+  "Teacher": {
+    "count": 2,
+    "files": [
+      "pages\\ResultApprovals.tsx",
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Teachers ({length})": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "Tell us what is wrong. The person is not told who reported.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Temporary password": {
+    "count": 3,
+    "files": [
+      "pages\\Admissions.tsx",
+      "pages\\Platform.tsx",
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Temporary passwords are shown only now and are not stored. Download or copy them and hand them out. Each person must change theirs after first sign-in.": {
+    "count": 1,
+    "files": [
+      "pages\\Admissions.tsx"
+    ]
+  },
+  "that is left.": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "The {channel}feature is built in a later phase. This channel is where it will live.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "The classes you teach. Open one to see its students and choose the class monitor.": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "The logo must be a PNG or JPG picture": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "The logo must be under 500 KB": {
+    "count": 1,
+    "files": [
+      "pages\\Branding.tsx"
+    ]
+  },
+  "The note below is stored against every invoice.": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "The start and end times must be different.": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "The student and parents are told. This cannot be undone.": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "The wording of every message the school sends by email, WhatsApp and in the app. Change any of them here. The defaults stay available if you want to go back.": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Their reason": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "They choose their own password the first time they sign in.": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "They lose access to this class's channels, homework and timetable.": {
+    "count": 1,
+    "files": [
+      "components\\ClassMembersPanel.tsx"
+    ]
+  },
+  "They will be asked to choose a new password the first time they sign in.": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "This channel no longer exists.": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "this conversation": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "This conversation has been reported and can be reviewed by the school. Messages in it can't be edited or deleted for now.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "This creates the school and its first admin, who then sets everything else up.": {
+    "count": 1,
+    "files": [
+      "pages\\Platform.tsx"
+    ]
+  },
+  "This message was deleted": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "This removes {value}.": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "Time": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Timetable": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Timetable saved": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Title": {
+    "count": 3,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Title (optional)": {
+    "count": 1,
+    "files": [
+      "pages\\Documents.tsx"
+    ]
+  },
+  "to": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "To": {
+    "count": 3,
+    "files": [
+      "pages\\Academic.tsx",
+      "pages\\Leave.tsx",
+      "pages\\Settings.tsx"
+    ]
+  },
+  "To: {audience}": {
+    "count": 2,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "today": {
+    "count": 2,
+    "files": [
+      "components\\AttendanceCalendar.tsx",
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Today": {
+    "count": 1,
+    "files": [
+      "components\\AttendanceCalendar.tsx"
+    ]
+  },
+  "Total {value}. Receipts go to students and parents.": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Transaction id": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "Type": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Type the school's address to confirm": {
+    "count": 1,
+    "files": [
+      "pages\\PlatformBilling.tsx"
+    ]
+  },
+  "typing…": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Unblock": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Unblocked": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Under 75% over the last 30 days (3 or more days recorded)": {
+    "count": 1,
+    "files": [
+      "pages\\Analytics.tsx"
+    ]
+  },
+  "Under review": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Unpaid": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Unsaved changes": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Until": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Uploading…": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Urgent": {
+    "count": 3,
+    "files": [
+      "components\\AttendanceCalendar.tsx",
+      "pages\\Channels.tsx",
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Use standard scale": {
+    "count": 1,
+    "files": [
+      "pages\\Academic.tsx"
+    ]
+  },
+  "Use the default": {
+    "count": 2,
+    "files": [
+      "components\\HueSlider.tsx",
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Used when:": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "User": {
+    "count": 2,
+    "files": [
+      "pages\\Approvals.tsx",
+      "pages\\Manage.tsx"
+    ]
+  },
+  "Users": {
+    "count": 1,
+    "files": [
+      "pages\\UsersPage.tsx"
+    ]
+  },
+  "View": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "Voice channel created": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "Waived": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Waiver declined": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Waiver pending": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "Waiver sent to the principal": {
+    "count": 1,
+    "files": [
+      "pages\\Fees.tsx"
+    ]
+  },
+  "waivers. Clerks request waivers from the Fees page.": {
+    "count": 1,
+    "files": [
+      "pages\\Records.tsx"
+    ]
+  },
+  "What happened?": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "WhatsApp": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "WhatsApp only reaches people who opted in. If it fails, email is used instead.": {
+    "count": 1,
+    "files": [
+      "components\\ChannelPicker.tsx"
+    ]
+  },
+  "When": {
+    "count": 2,
+    "files": [
+      "pages\\Settings.tsx",
+      "pages\\Simple.tsx"
+    ]
+  },
+  "Which child is this about": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "Why they need leave": {
+    "count": 1,
+    "files": [
+      "components\\LeavePanel.tsx"
+    ]
+  },
+  "Wording": {
+    "count": 1,
+    "files": [
+      "pages\\NotificationTemplates.tsx"
+    ]
+  },
+  "Write a message…": {
+    "count": 1,
+    "files": [
+      "components\\LeavePanel.tsx"
+    ]
+  },
+  "Write an announcement…": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Write down what you want to remember from this call…": {
+    "count": 1,
+    "files": [
+      "pages\\Voice.tsx"
+    ]
+  },
+  "You are not in any class yet, so there is no timetable to show.": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "You are reading a private conversation because it was reported. This is recorded.": {
+    "count": 1,
+    "files": [
+      "pages\\MessageReports.tsx"
+    ]
+  },
+  "You blocked {name}. Unblock to message again.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "You can no longer message this person. You can still read this conversation.": {
+    "count": 1,
+    "files": [
+      "pages\\Messages.tsx"
+    ]
+  },
+  "You have not submitted any requests yet.": {
+    "count": 1,
+    "files": [
+      "pages\\Manage.tsx"
+    ]
+  },
+  "You have unsaved changes. Switch class and lose them?": {
+    "count": 1,
+    "files": [
+      "pages\\Timetable.tsx"
+    ]
+  },
+  "Your answer": {
+    "count": 1,
+    "files": [
+      "pages\\Channels.tsx"
+    ]
+  },
+  "Your timezone": {
+    "count": 1,
+    "files": [
+      "pages\\Settings.tsx"
+    ]
+  },
+  "Zoom": {
+    "count": 1,
+    "files": [
+      "components\\PhotoCropDialog.tsx"
+    ]
+  }
+}
