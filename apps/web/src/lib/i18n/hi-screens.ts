@@ -28,7 +28,7 @@ const hi: Record<string, string> = {
   '(you)': '(आप)', 'Loading members…': 'सदस्य लोड हो रहे हैं…', 'No monitor': 'कोई मॉनिटर नहीं', 'No members in this class yet.': 'इस कक्षा में अभी कोई सदस्य नहीं है।',
   'Photo for {name}': '{name} की फ़ोटो', 'Drag to position the face inside the frame, and use the slider to zoom.': 'चेहरे को फ़्रेम के भीतर लाने के लिए खींचें, और ज़ूम के लिए स्लाइडर उपयोग करें।',
   'Photo preview. Drag to move it.': 'फ़ोटो का पूर्वावलोकन। हिलाने के लिए खींचें।',
-  'File shared': 'फ़ाइल साझा की गई', 'PDF, images, Word or text, up to 10 MB': 'PDF, चित्र, Word या टेक्स्ट, 10 MB तक', 'No files shared yet.': 'अभी कोई फ़ाइल साझा नहीं की गई है।',
+  'File shared': 'फ़ाइल साझा की गई', 'PDF, images, Word or text, up to 100 MB': 'PDF, चित्र, Word या टेक्स्ट, 100 MB तक', 'No files shared yet.': 'अभी कोई फ़ाइल साझा नहीं की गई है।',
   'Your school’s plan ends soon.': 'आपके स्कूल की योजना जल्द समाप्त होगी।', 'Your school’s plan has ended.': 'आपके स्कूल की योजना समाप्त हो गई है।',
   'Your school’s plan has ended, so new students cannot be added.': 'आपके स्कूल की योजना समाप्त हो गई है, इसलिए नए छात्र नहीं जोड़े जा सकते।', 'See the plan': 'योजना देखें',
 
@@ -64,10 +64,10 @@ const hi: Record<string, string> = {
   'User': 'उपयोगकर्ता', 'Requested by': 'अनुरोधकर्ता', 'Requested role': 'अनुरोधित भूमिका', 'Needs action': 'कार्रवाई ज़रूरी',
 
   // Branding
-  'Saved': 'सहेजा गया', 'The logo must be a PNG or JPG picture': 'लोगो PNG या JPG चित्र होना चाहिए', 'The logo must be under 500 KB': 'लोगो 500 KB से छोटा होना चाहिए',
+  'Saved': 'सहेजा गया', 'The logo must be a PNG or JPG picture': 'लोगो PNG या JPG चित्र होना चाहिए', 'The logo must be under 5 MB': 'लोगो 5 MB से छोटा होना चाहिए',
   'Logo updated': 'लोगो अपडेट हुआ', 'Logo removed': 'लोगो हटाया गया', 'How your school looks on the sign-in page and across the app.': 'साइन-इन पृष्ठ और पूरे ऐप में आपका स्कूल कैसा दिखता है।',
   'School name': 'स्कूल का नाम', 'Tagline': 'टैगलाइन', '(shown under the name on the sign-in page)': '(साइन-इन पृष्ठ पर नाम के नीचे दिखती है)', 'e.g. Learning together': 'जैसे: साथ मिलकर सीखें',
-  'Logo': 'लोगो', 'School logo': 'स्कूल का लोगो', 'PNG or JPG, up to 500 KB. A square picture on a plain background works best.': 'PNG या JPG, 500 KB तक। सादी पृष्ठभूमि पर वर्गाकार चित्र सबसे अच्छा रहता है।',
+  'Logo': 'लोगो', 'School logo': 'स्कूल का लोगो', 'PNG or JPG, up to 5 MB. A square picture on a plain background works best.': 'PNG या JPG, 5 MB तक। सादी पृष्ठभूमि पर वर्गाकार चित्र सबसे अच्छा रहता है।',
   'Preview of your sign-in page': 'आपके साइन-इन पृष्ठ का पूर्वावलोकन',
 
   // Class channels
@@ -132,7 +132,7 @@ const hi: Record<string, string> = {
   'This conversation has been reported and can be reviewed by the school. Messages in it can\'t be edited or deleted for now.': 'इस बातचीत की शिकायत हुई है और स्कूल इसकी समीक्षा कर सकता है। फ़िलहाल इसके संदेश संपादित या हटाए नहीं जा सकते।',
   'Load earlier messages': 'पुराने संदेश लोड करें', 'No messages yet. Say hello to {value}.': 'अभी कोई संदेश नहीं। {value} को नमस्ते कहें।', 'About': 'के बारे में', 'This message was deleted': 'यह संदेश हटा दिया गया',
   'Message options': 'संदेश के विकल्प', 'Under review': 'समीक्षा में', 'Report message': 'संदेश की शिकायत करें', '· edited': '· संपादित', 'Seen': 'देखा गया', 'Sent': 'भेजा गया', '{value} is typing…': '{value} टाइप कर रहे हैं…',
-  'Uploading…': 'अपलोड हो रहा है…', 'Which child is this about': 'यह किस बच्चे के बारे में है', 'Attach a file': 'फ़ाइल जोड़ें', 'Attach a file (PDF, image, Word, text; up to 10 MB)': 'फ़ाइल जोड़ें (PDF, चित्र, Word, टेक्स्ट; 10 MB तक)',
+  'Uploading…': 'अपलोड हो रहा है…', 'Which child is this about': 'यह किस बच्चे के बारे में है', 'Attach a file': 'फ़ाइल जोड़ें', 'Attach a file (PDF, image, Word, text; up to 100 MB)': 'फ़ाइल जोड़ें (PDF, चित्र, Word, टेक्स्ट; 100 MB तक)',
   'You blocked {name}. Unblock to message again.': 'आपने {name} को ब्लॉक किया है। दोबारा संदेश भेजने के लिए अनब्लॉक करें।', 'Unblock': 'अनब्लॉक करें', 'You can no longer message this person. You can still read this conversation.': 'अब आप इस व्यक्ति को संदेश नहीं भेज सकते। आप यह बातचीत पढ़ सकते हैं।',
   'New': 'नया', 'No conversations yet.': 'अभी कोई बातचीत नहीं।', 'Start one': 'शुरू करें', 'Choose a conversation, or start a new one.': 'कोई बातचीत चुनें, या नई शुरू करें।',
 

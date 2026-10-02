@@ -205,7 +205,7 @@ describe('the school page and branding', () => {
     expect((await putLogo(c.teacher, PNG)).status).toBe(403)
     expect((await putLogo(c.admin, Buffer.from('MZ not a picture'), 'logo.png')).status).toBe(400)
     expect((await putLogo(c.admin, PNG, 'logo.gif')).status).toBe(400)
-    expect((await putLogo(c.admin, Buffer.concat([PNG, Buffer.alloc(600 * 1024)]))).status).toBe(413)
+    expect((await putLogo(c.admin, Buffer.concat([PNG, Buffer.alloc(5 * 1024 * 1024 + 100 * 1024)]))).status).toBe(413)
     const ok = await putLogo(c.admin, PNG)
     expect(ok.status).toBe(200)
     expect(ok.body.logo).toMatch(/^\/api\/tenant\/school-a\/logo\?v=\d+$/)

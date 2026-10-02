@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useLocation, useNavigate } from 'react-router'
 import { io, type Socket } from 'socket.io-client'
 import { toast } from 'sonner'
-import { api, tokens } from './api'
+import { api, socketAuth } from './api'
 import { useAuth } from './auth'
 
 export interface LiveMessage {
@@ -54,7 +54,7 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     void refresh()
     const poll = setInterval(refresh, 60_000)
     // A function for auth so a reconnect always uses the newest token.
-    const socket = io(API, { auth: (cb) => cb({ token: tokens.access }), reconnectionDelayMax: 10_000 })
+    const socket = io(API, { auth: socketAuth(), reconnectionDelayMax: 10_000 })
     sock.current = socket
     for (const ev of ['dm:updated', 'dm:deleted', 'dm:read', 'dm:typing']) socket.on(ev, (p) => others.current.get(ev)?.forEach((fn) => fn(p)))
     socket.on('dm:message', (m: LiveMessage) => {

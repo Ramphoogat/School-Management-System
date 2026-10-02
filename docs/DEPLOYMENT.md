@@ -79,6 +79,8 @@ DATABASE_URL=postgresql://USER:PASSWORD@DBHOST:5432/school
 JWT_SECRET=<long random value 1>
 JWT_REFRESH_SECRET=<long random value 2>
 PORT=4000
+NODE_ENV=production
+TRUST_PROXY=1
 WEB_ORIGIN=https://school.example.com
 UPLOAD_DIR=/var/lib/school-uploads
 SUPERADMIN_EMAIL=you@yourdomain.com
@@ -86,12 +88,17 @@ SUPERADMIN_PASSWORD=<strong password>
 ```
 
 Then, as needed: `EMAIL_*` (a real SMTP provider), `WHATSAPP_*`, `RAZORPAY_*` including `RAZORPAY_WEBHOOK_SECRET`,
-`S3_*` instead of `UPLOAD_DIR`, `CLAMAV_HOST`. Leave a feature's values empty to keep it off.
+`S3_*` instead of `UPLOAD_DIR` (Cloudflare R2 is recommended; `SERVICES.md` section 4b has the steps, then run `pnpm --filter @school/api storage:check`), `CLAMAV_HOST`. Leave a feature's values empty to keep it off.
 
 Rules for `.env` on the server:
 
-- **Never leave the placeholder secrets** (`change-me`). The API does not check them for you, and anyone who knows them can
-  forge sign-ins.
+- **Never leave the placeholder secrets** (`change-me`). With `NODE_ENV=production` the API checks them at start-up and
+  **refuses to start** (with a message saying what is wrong) if a JWT secret is missing, under 32 characters, a placeholder or
+  equal to the other one, if `SUPERADMIN_PASSWORD` is a demo or under 12 characters, or if `WEB_ORIGIN` is localhost or not
+  `https://`. Anyone who knows the secrets can forge sign-ins.
+- `TRUST_PROXY=1` tells the API that Nginx is in front of it, so the sign-in limiter counts each visitor by their own address
+  instead of Nginx's. Set it only when the API is reachable through Nginx alone (port 4000 closed to the internet); otherwise
+  leave it empty.
 - **Remove the local Mailpit lines** (`EMAIL_HOST=localhost`, port 1025) unless you mean them.
 - `WEB_ORIGIN` must be exactly the address people type, with `https://` and no trailing slash. Comma-separate several.
   A wrong value breaks sign-in and live chat with a "CORS" error.
@@ -134,7 +141,7 @@ pnpm --filter @school/db exec dotenv -e ../../.env -- prisma migrate deploy
 
 ```bash
 cd /srv/school/app/apps/api
-pm2 start dist/main.js --name school-api --time
+pm2 start dist/main.js --name school-api --time --update-env   # reads NODE_ENV from the root .env
 pm2 save
 pm2 startup        # prints one command; run it with sudo so the API restarts after a reboot
 ```
@@ -155,8 +162,8 @@ server {
     root /var/www/school;
     index index.html;
 
-    # Uploads are up to 10 MB
-    client_max_body_size 12m;
+    # Uploads are up to 100 MB (the API's own limit); leave a little room for the form fields around the file
+    client_max_body_size 105m;
 
     # The API
     location /api/ {
@@ -196,7 +203,9 @@ sudo apt-get install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d school.example.com     # adds HTTPS and the automatic renewal
 ```
 
-After certbot, add security headers inside the HTTPS `server` block (the app does not send them itself yet):
+The API itself sends `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` and (in production)
+`Strict-Transport-Security` on every API response. Nginx serves the web pages, so add the same headers in the HTTPS `server`
+block for those:
 
 ```nginx
 add_header X-Content-Type-Options "nosniff" always;
@@ -205,8 +214,30 @@ add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 add_header Strict-Transport-Security "max-age=31536000" always;
 ```
 
-Do **not** add a strict `Content-Security-Policy` without testing: Razorpay's checkout loads a script from
-`checkout.razorpay.com`.
+### Content-Security-Policy (recommended; start in report-only mode)
+
+A Content-Security-Policy tells the browser which addresses the web app may load code, images and connections from, so an
+injected script cannot run or send data elsewhere. Add this to the HTTPS `server` block for the web pages, **changing
+`school.example.com` to your address**. Start with the **report-only** header:
+
+```nginx
+add_header Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' wss://school.example.com https://api.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+```
+
+Then: use the site (sign in, open every screen, a class chat and voice channel, upload a file, change the appearance, and **make a
+Razorpay test payment**) with the browser's developer console open. Any "Report Only" message in the console names something the
+policy would block. Fix the policy for what is legitimate, and when a full round of use shows nothing, change the header name
+to `Content-Security-Policy` (drop `-Report-Only`) and reload.
+
+Notes:
+- `'unsafe-inline'` is allowed for styles only, because the interface libraries add style rules while running. Scripts stay strict.
+- If your API is on a **different address** from the web app (`VITE_API_URL` points elsewhere), add that address to `img-src`
+  (school logos and ID card photos load from it) and `connect-src` (plus its `wss://` form for live features).
+- Razorpay's checkout has not been tried under this policy. If the payment window fails to open or complete, the report-only
+  messages will show which Razorpay address to add. Do not enforce the policy until a test payment works.
+- The policy was checked in a real browser against the app (sign-in, the main screens, every class channel, the appearance dialog,
+  live connections) with the enforced version and produced **no violations**; payments were not part of that check.
+- The API's own responses do not carry a Content-Security-Policy; they are data, not pages.
 
 ## 9. Backups (do this before launch, not after)
 
@@ -225,7 +256,8 @@ recovery is better still; turn it on.
 **The files:**
 
 - On disk (`UPLOAD_DIR`): copy `/var/lib/school-uploads` nightly, for example `rsync -a` to another machine or a bucket.
-- On S3/R2: turn on **versioning** on the bucket, and keep a second copy if the provider allows.
+- On S3/R2: on Amazon S3 turn on **versioning**. Cloudflare R2 did not offer versioning when this was written, so keep a second copy
+  instead: a nightly `rclone sync` from the bucket to another provider or your own server, and check now and then that it restores.
 
 **Restore test** (do it once on a spare machine and write down how long it took):
 
@@ -244,7 +276,9 @@ Then point a test copy of the app at it and sign in.
 4. Create the real school (Schools → Add school) and sign in as its first admin with the one-time password.
    The admin must change it at once.
 5. Confirm there is **no** `student@school.test`, `admin@school.test` or any other demo account: try them and expect a failure.
-6. Send yourself an email (create an announcement to yourself) and check it arrives and is not in spam.
+6. Send yourself an email (create an announcement to yourself) and check it arrives and is not in spam. Then use
+   "Forgot your password?" on the sign-in page for a test account, and check the link arrives, opens the right address (from
+   `WEB_ORIGIN`), works once, and the second use is refused.
 7. If Razorpay is on: make a test-mode payment and a refund, and check the webhook (Razorpay dashboard → Webhooks →
    recent deliveries show `200`). Webhook address: `https://school.example.com/api/fees/razorpay/webhook`.
 8. If WhatsApp is on: send to a number you own that has opted in.
@@ -310,7 +344,11 @@ There is **no built-in monitoring, health-check route or error tracking yet.** U
 |---|---|
 | `FEE_REMINDERS=off` | Stops the hourly fee reminder job (it runs between 8:00 and 20:00, server time). Use it on any extra copy of the API. |
 | `NOTIFICATIONS_WORKER=off` | Stops the notification worker. For tests only; on a real server email and WhatsApp would stop being sent. |
-| `CLAMAV_HOST` / `CLAMAV_PORT` / `CLAMAV_TIMEOUT_MS` | Virus scan every upload. Uploads are refused while the scanner is unreachable. |
+| `CLAMAV_HOST` / `CLAMAV_PORT` / `CLAMAV_TIMEOUT_MS` | Virus scan every upload. Uploads are refused while the scanner is unreachable. With the 100 MB upload limit, raise ClamAV's `StreamMaxLength` (default 25 MB) to at least `100M` and set `CLAMAV_TIMEOUT_MS` to about `120000`, or large files will be refused. |
+| Upload size (100 MB) | One setting in the code, `MAX_FILE_BYTES` in `apps/api/src/storage/upload-rules.ts`. Each upload is held in memory while handled, so size the server's RAM for a few at once, and keep Nginx's `client_max_body_size` at `105m` or more. |
+| `GDRIVE_FOLDER_ID` + `GDRIVE_SERVICE_ACCOUNT_JSON` / `GDRIVE_CLIENT_*` | Extra storage in Google Drive (`SERVICES.md` 4d). A secret key lives here, so keep `.env` private (`chmod 600`). The server must be able to reach `www.googleapis.com` and `oauth2.googleapis.com`. Back up Drive-held files too. |
+| `STORAGE_PRIMARY_LIMIT_GB` | Gigabytes the main storage may hold before "Automatic" sends new files to Google Drive. Empty = only when the main storage refuses a file. |
+| Adding files from a link | The API downloads files from addresses people paste, so it needs outbound internet access. It refuses private and internal addresses itself, but also **do not give the API server access to anything sensitive on its own network** it does not need. Allow outbound HTTPS (and HTTP) from the API to the internet only. |
 | Server time zone | Reminder hours and "today" follow the server clock. Set the server to the school's time zone (`timedatectl set-timezone Asia/Kolkata`). |
 
 ## 16. If something goes wrong
@@ -320,9 +358,12 @@ There is **no built-in monitoring, health-check route or error tracking yet.** U
 | Blank page or "CORS error" in the browser console | `WEB_ORIGIN` does not exactly match the address in the browser. Fix `.env`, `pm2 restart school-api`. |
 | Sign-in works but chat, presence or calls do not | Nginx is missing the `/socket.io/` block or the WebSocket headers. |
 | Every page says "Loading…" or fails with 502 | The API is down: `pm2 status`, `pm2 logs school-api`. |
-| Uploads fail with 413 | `client_max_body_size` in Nginx is below 10 MB. |
+| Uploads fail with 413 | `client_max_body_size` in Nginx is below 100 MB (use `105m`), or the file really is over the app's 100 MB limit. |
+| Large uploads fail or the API restarts while people upload | Each upload is held in the API's memory while it is checked and stored, so several 100 MB uploads at once need that much spare RAM. Give the server enough memory (see section 15) and watch `pm2 monit`. |
 | "Email is not configured" in the Delivery log | `EMAIL_HOST` is empty or wrong. |
 | Fee paid at Razorpay but invoice still unpaid | Webhook not reaching the API or `RAZORPAY_WEBHOOK_SECRET` is wrong; check Razorpay's webhook delivery log. The clerk can mark it paid by hand meanwhile. |
 | Voice call never connects for some people | Their network blocks direct connections: add a TURN relay. |
-| Everyone was signed out | `JWT_SECRET` changed. That is the expected effect of changing it. |
+| Everyone was signed out | `JWT_SECRET` or `JWT_REFRESH_SECRET` changed. That is the expected effect of changing it. |
+| The API exits at start-up with "will not start with unsafe settings" | Read the list it prints and fix those values in `.env` (section 4). |
+| A real user is told "Too many sign-in attempts" | They (or someone pretending to be them) got the password wrong 10 times in 15 minutes. It clears by itself after the time shown, or restart the API to clear it at once. Everyone sharing one school network can hit the per-network limit if `TRUST_PROXY` is not set. |
 | `prisma generate` says EPERM on Windows | The API is running and holds the file. Stop it first. |

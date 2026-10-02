@@ -150,11 +150,11 @@ describe('certificates', () => {
 })
 
 describe('class chat', () => {
-  it('serves history only to class members and the principal', async () => {
+  it('serves history to the class, its parents and school staff, and to nobody else', async () => {
     expect((await c.student.get(`/chat/${w.classA}`)).status).toBe(200)
     expect((await c.teacher.get(`/chat/${w.classA}`)).status).toBe(200)
-    expect((await c.principal.get(`/chat/${w.classA}`)).status).toBe(200)
-    for (const r of ['parent', 'teacher2', 'clerk', 'admin'] as const) expect((await c[r].get(`/chat/${w.classA}`)).status, r).toBe(403)
+    for (const r of ['principal', 'admin', 'clerk', 'parent'] as const) expect((await c[r].get(`/chat/${w.classA}`)).status, r).toBe(200)
+    expect((await c.teacher2.get(`/chat/${w.classA}`)).status).toBe(403) // a teacher of another class
   })
 
   it('delivers live messages to joined members, refuses outsiders, and disconnects bad tokens', async () => {
@@ -164,17 +164,17 @@ describe('class chat', () => {
     const connect = (token: string) => new Promise<Socket>((resolve) => { const s = io(`http://localhost:${port}`, { auth: { token }, reconnection: false }); sockets.push(s); s.on('connect', () => resolve(s)); s.on('disconnect', () => resolve(s)) })
     const ack = (s: Socket, ev: string, d: object) => new Promise<any>((r) => s.emit(ev, d, r))
     try {
-      const student = await connect(c.student.token), teacher = await connect(c.teacher.token), parent = await connect(c.parent.token)
+      const student = await connect(c.student.token), teacher = await connect(c.teacher.token), outsider = await connect(c.teacher2.token)
       expect(await ack(student, 'join', { classId: w.classA })).toEqual({ ok: true })
       expect(await ack(teacher, 'join', { classId: w.classA })).toEqual({ ok: true })
-      expect((await ack(parent, 'join', { classId: w.classA })).ok).toBe(false)
+      expect((await ack(outsider, 'join', { classId: w.classA })).ok).toBe(false)
 
       const received = new Promise<any>((r) => student.on('message', r))
-      expect((await ack(parent, 'message', { classId: w.classA, body: 'let me in' })).ok).toBe(false)
+      expect((await ack(outsider, 'message', { classId: w.classA, body: 'let me in' })).ok).toBe(false)
       expect((await ack(teacher, 'message', { classId: w.classA, body: '  Welcome!  ' })).ok).toBe(true)
       const m = await Promise.race([received, new Promise((r) => setTimeout(() => r('timeout'), 4000))])
       expect(m).toMatchObject({ body: 'Welcome!', senderId: w.u.teacher, senderName: 'teacher' })
-      expect(await prisma.chatMessage.count({ where: { classId: w.classA } })).toBe(1) // the parent's attempt was not stored
+      expect(await prisma.chatMessage.count({ where: { classId: w.classA } })).toBe(1) // the outsider's attempt was not stored
 
       expect((await ack(teacher, 'message', { classId: w.classA, body: '   ' })).ok).toBe(false)
       expect((await ack(teacher, 'message', { classId: w.classB, body: 'wrong class' })).ok).toBe(false)

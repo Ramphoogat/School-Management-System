@@ -3,6 +3,7 @@ import { FileText, Trash2, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import { api, downloadFile, uploadFile } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { AddFromLink } from '@/components/LinkImport'
 import { useT } from '@/lib/i18n'
 
 interface Res { id: string; name: string; size: number; createdAt: string; uploadedBy: string }
@@ -31,10 +32,11 @@ export function Resources({ classId }: { classId: string }) {
   return (
     <div className="max-w-2xl space-y-4">
       {data.canUpload && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <input ref={input} type="file" hidden accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.txt" onChange={(e) => pick(e.target.files?.[0])} />
           <Button size="sm" disabled={busy} onClick={() => input.current?.click()}><Upload className="mr-1 size-4" />{busy ? 'Uploading…' : 'Share a file'}</Button>
-          <span className="text-xs text-muted-foreground">{t('PDF, images, Word or text, up to 10 MB')}</span>
+          <AddFromLink path={`/resources/class/${classId}`} onDone={() => { void load() }} />
+          <span className="text-xs text-muted-foreground">{t('PDF, images, Word or text, up to 100 MB')}</span>
         </div>
       )}
       {data.files.length === 0 ? (

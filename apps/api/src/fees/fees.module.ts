@@ -195,7 +195,7 @@ export class FeesController {
   @Post('invoices')
   @RequirePermission('fees', 'bulk_write')
   async create(@CurrentUser() user: AuthUser, @Body() dto: CreateInvoicesDto) {
-    const cls = await this.prisma.class.findFirst({ where: { id: dto.classId, schoolId: user.schoolId } })
+    const cls = await this.prisma.class.findFirst({ where: { id: dto.classId, schoolId: user.schoolId, deletedAt: null } })
     if (!cls || !can(user, 'fees', 'bulk_write', { schoolId: cls.schoolId })) throw new ForbiddenException()
     const members = await this.prisma.classMember.findMany({ where: { classId: dto.classId, roleInClass: 'student' }, select: { userId: true } })
     const existing = await this.prisma.invoice.findMany({ where: { classId: dto.classId, title: dto.title }, select: { studentId: true } })

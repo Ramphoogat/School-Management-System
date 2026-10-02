@@ -28,7 +28,7 @@ const te: Record<string, string> = {
   '(you)': '(మీరు)', 'Loading members…': 'సభ్యులు లోడ్ అవుతున్నారు…', 'No monitor': 'మానిటర్ లేరు', 'No members in this class yet.': 'ఈ తరగతిలో ఇంకా సభ్యులు లేరు.',
   'Photo for {name}': '{name} ఫోటో', 'Drag to position the face inside the frame, and use the slider to zoom.': 'ముఖాన్ని ఫ్రేమ్ లోపల ఉంచడానికి లాగండి, జూమ్ చేయడానికి స్లైడర్ వాడండి.',
   'Photo preview. Drag to move it.': 'ఫోటో ప్రివ్యూ. కదపడానికి లాగండి.',
-  'File shared': 'ఫైల్ షేర్ చేయబడింది', 'PDF, images, Word or text, up to 10 MB': 'PDF, చిత్రాలు, Word లేదా టెక్స్ట్, 10 MB వరకు', 'No files shared yet.': 'ఇంకా ఫైళ్లు షేర్ చేయలేదు.',
+  'File shared': 'ఫైల్ షేర్ చేయబడింది', 'PDF, images, Word or text, up to 100 MB': 'PDF, చిత్రాలు, Word లేదా టెక్స్ట్, 100 MB వరకు', 'No files shared yet.': 'ఇంకా ఫైళ్లు షేర్ చేయలేదు.',
   'Your school’s plan ends soon.': 'మీ పాఠశాల ప్లాన్ త్వరలో ముగుస్తుంది.', 'Your school’s plan has ended.': 'మీ పాఠశాల ప్లాన్ ముగిసింది.',
   'Your school’s plan has ended, so new students cannot be added.': 'మీ పాఠశాల ప్లాన్ ముగిసింది, కాబట్టి కొత్త విద్యార్థులను చేర్చలేరు.', 'See the plan': 'ప్లాన్ చూడండి',
 
@@ -64,10 +64,10 @@ const te: Record<string, string> = {
   'User': 'వినియోగదారు', 'Requested by': 'అభ్యర్థించినవారు', 'Requested role': 'అభ్యర్థించిన పాత్ర', 'Needs action': 'చర్య అవసరం',
 
   // Branding
-  'Saved': 'సేవ్ అయింది', 'The logo must be a PNG or JPG picture': 'లోగో PNG లేదా JPG చిత్రం అయి ఉండాలి', 'The logo must be under 500 KB': 'లోగో 500 KB కంటే తక్కువ ఉండాలి',
+  'Saved': 'సేవ్ అయింది', 'The logo must be a PNG or JPG picture': 'లోగో PNG లేదా JPG చిత్రం అయి ఉండాలి', 'The logo must be under 5 MB': 'లోగో 5 MB కంటే తక్కువ ఉండాలి',
   'Logo updated': 'లోగో నవీకరించబడింది', 'Logo removed': 'లోగో తొలగించబడింది', 'How your school looks on the sign-in page and across the app.': 'సైన్ ఇన్ పేజీలో మరియు యాప్ అంతటా మీ పాఠశాల ఎలా కనిపిస్తుంది.',
   'School name': 'పాఠశాల పేరు', 'Tagline': 'ట్యాగ్‌లైన్', '(shown under the name on the sign-in page)': '(సైన్ ఇన్ పేజీలో పేరు కింద చూపబడుతుంది)', 'e.g. Learning together': 'ఉదా: కలిసి నేర్చుకుందాం',
-  'Logo': 'లోగో', 'School logo': 'పాఠశాల లోగో', 'PNG or JPG, up to 500 KB. A square picture on a plain background works best.': 'PNG లేదా JPG, 500 KB వరకు. సాదా నేపథ్యంపై చతురస్ర చిత్రం ఉత్తమం.',
+  'Logo': 'లోగో', 'School logo': 'పాఠశాల లోగో', 'PNG or JPG, up to 5 MB. A square picture on a plain background works best.': 'PNG లేదా JPG, 5 MB వరకు. సాదా నేపథ్యంపై చతురస్ర చిత్రం ఉత్తమం.',
   'Preview of your sign-in page': 'మీ సైన్ ఇన్ పేజీ ప్రివ్యూ',
 
   // Class channels
@@ -132,7 +132,7 @@ const te: Record<string, string> = {
   'This conversation has been reported and can be reviewed by the school. Messages in it can\'t be edited or deleted for now.': 'ఈ సంభాషణపై ఫిర్యాదు చేయబడింది, పాఠశాల దీన్ని సమీక్షించవచ్చు. ప్రస్తుతానికి దీనిలోని సందేశాలను సవరించలేరు లేదా తొలగించలేరు.',
   'Load earlier messages': 'పాత సందేశాలను లోడ్ చేయండి', 'No messages yet. Say hello to {value}.': 'ఇంకా సందేశాలు లేవు. {value}కు హలో చెప్పండి.', 'About': 'గురించి', 'This message was deleted': 'ఈ సందేశం తొలగించబడింది',
   'Message options': 'సందేశ ఎంపికలు', 'Under review': 'సమీక్షలో ఉంది', 'Report message': 'సందేశంపై ఫిర్యాదు చేయండి', '· edited': '· సవరించబడింది', 'Seen': 'చూశారు', 'Sent': 'పంపబడింది', '{value} is typing…': '{value} టైప్ చేస్తున్నారు…',
-  'Uploading…': 'అప్‌లోడ్ అవుతోంది…', 'Which child is this about': 'ఇది ఏ పిల్లవాడి గురించి', 'Attach a file': 'ఫైల్ జత చేయండి', 'Attach a file (PDF, image, Word, text; up to 10 MB)': 'ఫైల్ జత చేయండి (PDF, చిత్రం, Word, టెక్స్ట్; 10 MB వరకు)',
+  'Uploading…': 'అప్‌లోడ్ అవుతోంది…', 'Which child is this about': 'ఇది ఏ పిల్లవాడి గురించి', 'Attach a file': 'ఫైల్ జత చేయండి', 'Attach a file (PDF, image, Word, text; up to 100 MB)': 'ఫైల్ జత చేయండి (PDF, చిత్రం, Word, టెక్స్ట్; 100 MB వరకు)',
   'You blocked {name}. Unblock to message again.': 'మీరు {name}ను బ్లాక్ చేశారు. మళ్లీ సందేశం పంపడానికి అన్‌బ్లాక్ చేయండి.', 'Unblock': 'అన్‌బ్లాక్ చేయండి', 'You can no longer message this person. You can still read this conversation.': 'మీరు ఇక ఈ వ్యక్తికి సందేశం పంపలేరు. ఈ సంభాషణ మాత్రం చదవవచ్చు.',
   'New': 'కొత్త', 'No conversations yet.': 'ఇంకా సంభాషణలు లేవు.', 'Start one': 'ఒకటి ప్రారంభించండి', 'Choose a conversation, or start a new one.': 'ఒక సంభాషణను ఎంచుకోండి, లేదా కొత్తది ప్రారంభించండి.',
 

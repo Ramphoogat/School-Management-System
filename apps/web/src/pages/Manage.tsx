@@ -11,6 +11,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Pager, usePaged } from '@/components/Pager'
 import { ClassMembersPanel } from '@/components/ClassMembersPanel'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { RotateCcw, Trash2 } from 'lucide-react'
+
+interface DeletedClass { id: string; name: string; deletedAt: string; deletedByName: string | null; members: number }
 
 interface DirUser { id: string; name: string; email: string; role: string }
 
@@ -190,8 +194,38 @@ export function Classes() {
   const pg_classes = usePaged(classes)
   const [name, setName] = useState('')
   const [managing, setManaging] = useState<{ id: string; name: string } | null>(null)
-  const load = useCallback(() => api<any[]>('/classes').then(setClasses), [])
+  // Only the principal and admin may delete a class, see the deleted ones and restore them (the server enforces it too).
+  const canDelete = can('classes', 'delete')
+  const [deleted, setDeleted] = useState<DeletedClass[]>([])
+  const [confirming, setConfirming] = useState<{ id: string; name: string; members: number } | null>(null)
+  const [busy, setBusy] = useState(false)
+  const load = useCallback(async () => {
+    await api<any[]>('/classes').then(setClasses)
+    if (canDelete) await api<DeletedClass[]>('/classes/deleted').then(setDeleted).catch(() => setDeleted([]))
+  }, [canDelete])
   useEffect(() => { load() }, [load])
+  const changed = async () => { await load(); window.dispatchEvent(new Event('classes-changed')) } // the side menu refreshes too
+
+  const restore = async (c: { id: string; name: string }) => {
+    try {
+      await api(`/classes/${c.id}/restore`, { method: 'POST', body: {} })
+      toast.success(t('{name} was restored', { name: c.name }))
+      await changed()
+    } catch (err) { toast.error((err as Error).message) }
+  }
+
+  const remove = async () => {
+    if (!confirming) return
+    const c = confirming
+    setBusy(true)
+    try {
+      await api(`/classes/${c.id}`, { method: 'DELETE' })
+      setConfirming(null)
+      // The confirmation message offers an undo for a few seconds, and the class can always be restored from the list below.
+      toast.success(t('{name} was deleted', { name: c.name }), { description: t('It is in “Deleted classes” below, where you can restore it.'), duration: 10000, action: { label: t('Undo'), onClick: () => void restore(c) } })
+      await changed()
+    } catch (err) { toast.error((err as Error).message) } finally { setBusy(false) }
+  }
 
   const create = async (e: FormEvent) => {
     e.preventDefault()
@@ -230,14 +264,68 @@ export function Classes() {
               <TableCell>{c.classTeacherName ?? <span className="text-muted-foreground">{t('Not assigned')}</span>}</TableCell>
               <TableCell>{c._count.members}</TableCell>
               <TableCell>{c.channels.length}</TableCell>
-              <TableCell className="text-right"><Button size="sm" variant="outline" onClick={() => setManaging({ id: c.id, name: c.name })}>{canWrite ? 'Manage' : 'Open'}</Button></TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setManaging({ id: c.id, name: c.name })}>{canWrite ? 'Manage' : 'Open'}</Button>
+                  {canDelete && (
+                    <Button size="sm" variant="ghost" className="gap-1.5 text-destructive hover:text-destructive" aria-label={t('Delete {name}', { name: c.name })} onClick={() => setConfirming({ id: c.id, name: c.name, members: c._count.members })}>
+                      <Trash2 className="size-4" aria-hidden />{t('Delete')}
+                    </Button>
+                  )}
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
 <Pager {...pg_classes.props} />
 </>
-      <ClassMembersPanel canManage={canWrite} cls={managing} onClose={() => setManaging(null)} onChanged={() => { load(); window.dispatchEvent(new Event('classes-changed')) }} />
+      {canDelete && (
+        <section aria-labelledby="deleted-classes" className="space-y-3">
+          <div>
+            <h2 id="deleted-classes" className="text-lg font-semibold">{t('Deleted classes')}</h2>
+            <p className="text-sm text-muted-foreground">{t('A deleted class is hidden from its students, teachers and parents, but nothing is erased. Restore it to bring it back exactly as it was.')}</p>
+          </div>
+          {deleted.length === 0 ? (
+            <p className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">{t('No deleted classes.')}</p>
+          ) : (
+            <ul className="divide-y rounded-lg border">
+              {deleted.map((c) => (
+                <li key={c.id} className="flex flex-wrap items-center gap-3 p-3">
+                  <div className="min-w-0 flex-1 basis-48">
+                    <p className="font-medium">{c.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('Deleted {date}', { date: new Date(c.deletedAt).toLocaleDateString() })}{c.deletedByName ? ` · ${t('by {name}', { name: c.deletedByName })}` : ''} · {t('{n} member(s)', { n: c.members })}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" className="gap-1.5" aria-label={t('Restore {name}', { name: c.name })} onClick={() => restore(c)}>
+                    <RotateCcw className="size-4" aria-hidden />{t('Restore')}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      <AlertDialog open={!!confirming} onOpenChange={(o) => { if (!o && !busy) setConfirming(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('Delete {name}?', { name: confirming?.name ?? '' })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('The class will disappear for its {n} member(s): its students, teachers and parents will no longer see it, its homework, books, chat or marks. Nothing is erased. You can restore it at any time from “Deleted classes”.', { n: confirming?.members ?? 0 })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>{t('Cancel')}</AlertDialogCancel>
+            <AlertDialogAction disabled={busy} className="bg-destructive text-white hover:bg-destructive/90" onClick={(e) => { e.preventDefault(); void remove() }}>
+              {busy ? t('Deleting…') : t('Delete class')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <ClassMembersPanel canManage={canWrite} cls={managing} onClose={() => setManaging(null)} onChanged={() => { void changed() }} />
     </div>
   )
 }

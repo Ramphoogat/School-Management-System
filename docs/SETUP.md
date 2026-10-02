@@ -88,6 +88,9 @@ the controller (the routes), the service (the logic) and the DTO classes (input 
   with `can(user, …)`. The web app uses the same file to hide what a role cannot use, but **the API is the authority**.
 - **Every request re-reads the person's role, class and school from the database** (`auth/guards.ts`), so a role change or
   a deactivation applies at once. Every query is filtered by `schoolId`.
+- **Sign-in safety:** wrong passwords are counted per email and per network address (`auth/rate-limit.ts`); login tokens carry
+  the person's `tokenVersion`, and raising it (password change or reset, deactivation, "sign out of all devices") ends every
+  token at once; `common/security.ts` sets the response headers and, in production, refuses weak secrets at start-up.
 - **Every change is written to the audit log** through `AuditService.log`. Bulk actions write one entry per record plus one
   for the bulk itself.
 - **Bulk actions** return `{ succeeded, total, failed[] }` and never let one bad row block the rest.

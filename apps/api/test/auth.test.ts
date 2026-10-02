@@ -96,7 +96,8 @@ describe('auth', () => {
     await prisma.user.update({ where: { id: w.u.student }, data: { mustChangePassword: true } })
     const c = client(app, await login(app, 'student@a.test'))
     expect((await c.get('/auth/me')).body.mustChangePassword).toBe(true)
-    await c.post('/auth/change-password', { currentPassword: PASSWORD, newPassword: 'another-pass1' })
-    expect((await c.get('/auth/me')).body.mustChangePassword).toBe(false)
+    const changed = await c.post('/auth/change-password', { currentPassword: PASSWORD, newPassword: 'another-pass1' })
+    expect((await c.get('/auth/me')).status).toBe(401) // the old token is replaced by the one in the reply
+    expect((await client(app, changed.body.accessToken).get('/auth/me')).body.mustChangePassword).toBe(false)
   })
 })

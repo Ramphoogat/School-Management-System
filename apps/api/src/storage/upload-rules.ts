@@ -2,7 +2,7 @@
  * What may be uploaded, and how a file is judged. The type is decided from the extension and the file's own first bytes,
  * never from what the browser claims, so a renamed program cannot pass as a picture.
  */
-export const MAX_FILE_BYTES = 10 * 1024 * 1024
+export const MAX_FILE_BYTES = 100 * 1024 * 1024
 
 export const FILE_TYPES: Record<string, { mime: string; ok: (b: Buffer) => boolean }> = {
   pdf: { mime: 'application/pdf', ok: (b) => b.subarray(0, 4).toString() === '%PDF' },

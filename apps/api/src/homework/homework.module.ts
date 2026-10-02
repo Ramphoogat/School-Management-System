@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, ForbiddenException, Get, Delete, Module, NotFoundException, Param, Post, Query, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import type { Response } from 'express'
-import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsIn, IsOptional, IsString, Matches, MinLength } from 'class-validator'
+import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsIn, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator'
 import { can } from '@school/permissions'
 import { randomUUID } from 'node:crypto'
 import { PrismaService } from '../prisma/prisma.module'
@@ -10,6 +10,7 @@ import { Channel, CHANNELS, EventBus } from '../events/events.module'
 import { deleteFile, getFile, newKey, putFile } from '../storage/storage'
 import { checkUpload, contentHeaders, MAX_FILE_BYTES, type Upload } from '../storage/uploads'
 import { AuthGuard, CurrentUser, PermissionGuard, type AuthUser } from '../auth/guards'
+import { ImportService } from '../import/import.module'
 
 const MAX_FILES_PER_OWNER = 5
 const fileView = (f: { id: string; name: string; size: number; createdAt: Date }) => ({ id: f.id, name: f.name, size: f.size, createdAt: f.createdAt })
@@ -25,11 +26,15 @@ class AssignDto {
 class SubmitDto {
   @IsString() @MinLength(1) text: string
 }
+class UploadLink {
+  /** A link to fetch the file from, instead of uploading one. Teachers only: students always upload from their own device. */
+  @IsOptional() @IsString() @MaxLength(2000) url?: string
+}
 
 @Controller('homework')
 @UseGuards(AuthGuard, PermissionGuard)
 export class HomeworkController {
-  constructor(private prisma: PrismaService, private audit: AuditService, private bus: EventBus) {}
+  constructor(private prisma: PrismaService, private audit: AuditService, private bus: EventBus, private importer: ImportService) {}
 
   /** Who may see a class's homework: its members and teacher, school staff, and parents of a child in it. */
   private async canViewClass(user: AuthUser, classId: string) {
@@ -60,12 +65,14 @@ export class HomeworkController {
     })
     const isStudent = user.role === 'student'
     const canReview = can(user, 'homework', 'write', { classId }) || can(user, 'homework', 'read')
+    const studentCount = canReview ? await this.prisma.classMember.count({ where: { classId, roleInClass: 'student' } }) : undefined
     return rows.map(({ submissions, files, ...a }) => ({
       ...a,
       files: files.filter((f) => !f.studentId).map(fileView),
       myFiles: isStudent ? files.filter((f) => f.studentId === user.id).map(fileView) : undefined,
       dueDate: a.dueDate.toISOString().slice(0, 10),
       submittedCount: submissions.length,
+      studentCount,
       mySubmission: isStudent ? submissions.find((s) => s.studentId === user.id) ?? null : undefined,
       canReview,
     }))
@@ -79,7 +86,7 @@ export class HomeworkController {
     const bulkId = randomUUID()
     const results: { classId: string; ok: boolean; error?: string }[] = []
     for (const classId of [...new Set(dto.classIds)]) {
-      const cls = await this.prisma.class.findFirst({ where: { id: classId, schoolId: user.schoolId } })
+      const cls = await this.prisma.class.findFirst({ where: { id: classId, schoolId: user.schoolId, deletedAt: null } })
       if (!cls || !can(user, 'homework', 'write', { classId })) {
         results.push({ classId, ok: false, error: 'Not permitted for this class' })
         continue
@@ -135,20 +142,22 @@ export class HomeworkController {
    */
   @Post(':id/files')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_FILE_BYTES, files: 1 } }))
-  async upload(@CurrentUser() user: AuthUser, @Param('id') id: string, @UploadedFile() file: Upload | undefined) {
+  async upload(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() body: UploadLink, @UploadedFile() file: Upload | undefined) {
     const a = await this.prisma.assignment.findFirst({ where: { id, schoolId: user.schoolId } })
     if (!a) throw new NotFoundException()
     const teacher = can(user, 'homework', 'write', { classId: a.classId })
     const member = user.role === 'student' && can(user, 'homework', 'submit', { studentId: user.id }) && !!(await this.prisma.classMember.findFirst({ where: { classId: a.classId, userId: user.id, roleInClass: 'student' } }))
     if (!teacher && !member) throw new ForbiddenException()
-    const checked = checkUpload(file)
+    // The importer refuses students itself; the link is only for the people who may attach to an assignment.
+    const upload = file ?? (body?.url?.trim() ? await this.importer.fromLink(user, body.url) : undefined)
+    const checked = checkUpload(upload)
     const studentId = teacher ? null : user.id
     if ((await this.prisma.homeworkFile.count({ where: { assignmentId: id, studentId } })) >= MAX_FILES_PER_OWNER) throw new BadRequestException(`At most ${MAX_FILES_PER_OWNER} files here. Remove one first.`)
     const storageKey = newKey()
-    await putFile(storageKey, file!.buffer)
+    await putFile(storageKey, upload!.buffer, { schoolId: user.schoolId })
     try {
       if (studentId) await this.prisma.submission.upsert({ where: { assignmentId_studentId: { assignmentId: id, studentId } }, update: {}, create: { assignmentId: id, studentId, text: '' } })
-      const row = await this.prisma.homeworkFile.create({ data: { schoolId: user.schoolId, assignmentId: id, studentId, uploadedById: user.id, name: checked.name, mime: checked.mime, size: file!.size, storageKey } })
+      const row = await this.prisma.homeworkFile.create({ data: { schoolId: user.schoolId, assignmentId: id, studentId, uploadedById: user.id, name: checked.name, mime: checked.mime, size: upload!.size, storageKey } })
       await this.audit.log(this.prisma, { schoolId: user.schoolId, actorId: user.id, action: 'homework.file_uploaded', resource: 'assignment', resourceId: id, meta: { fileId: row.id, name: row.name, size: row.size } })
       return fileView(row)
     } catch (e) {

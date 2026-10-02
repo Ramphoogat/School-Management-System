@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { api } from '@/lib/api'
+import { api, tokens } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -157,14 +157,18 @@ export function DeliveryLog() {
 
 export function ChangePassword() {
   const { t } = useT()
-  const { reload } = useAuth()
+  const { reload, logout } = useAuth()
+  const signOutEverywhere = async () => {
+    try { await api('/auth/logout-all', { method: 'POST', body: {} }); logout() } catch (e) { toast.error((e as Error).message) }
+  }
   const [cur, setCur] = useState('')
   const [next, setNext] = useState('')
   const [busy, setBusy] = useState(false)
   const submit = async () => {
     setBusy(true)
     try {
-      await api('/auth/change-password', { body: { currentPassword: cur, newPassword: next } })
+      const r = await api<{ accessToken: string; refreshToken: string }>('/auth/change-password', { body: { currentPassword: cur, newPassword: next } })
+      tokens.set(r.accessToken, r.refreshToken) // other devices are signed out; this one continues
       toast.success(t('Password changed')); setCur(''); setNext(''); await reload()
     } catch (e) { toast.error((e as Error).message) } finally { setBusy(false) }
   }
@@ -174,6 +178,8 @@ export function ChangePassword() {
       <Input type="password" placeholder={t('Current password')} value={cur} onChange={(e) => setCur(e.target.value)} />
       <Input type="password" placeholder={t('New password (8+ characters)')} value={next} onChange={(e) => setNext(e.target.value)} />
       <Button onClick={submit} disabled={busy || !cur || next.length < 8}>{t('Change password')}</Button>
+      <p className="text-xs text-muted-foreground">{t('Changing your password signs you out of every other device.')}</p>
+      <Button variant="outline" onClick={signOutEverywhere}>{t('Sign out of all devices')}</Button>
     </section>
   )
 }

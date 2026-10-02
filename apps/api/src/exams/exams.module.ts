@@ -60,7 +60,7 @@ export class ExamsController {
 
   @Post()
   async create(@CurrentUser() user: AuthUser, @Body() dto: CreateExamDto) {
-    const cls = await this.prisma.class.findFirst({ where: { id: dto.classId, schoolId: user.schoolId } })
+    const cls = await this.prisma.class.findFirst({ where: { id: dto.classId, schoolId: user.schoolId, deletedAt: null } })
     if (!cls || !can(user, 'results', 'write', { classId: dto.classId })) throw new ForbiddenException()
     const when = new Date(`${dto.date}T00:00:00.000Z`)
     let termId: string | null = null

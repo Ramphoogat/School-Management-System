@@ -25,14 +25,15 @@ export const CHILD_TABLES: Record<string, { parent: string; fk: string }> = {
   NotificationPreference: { parent: 'User', fk: 'userId' },
   QuietHours: { parent: 'User', fk: 'userId' },
   WhatsAppConsent: { parent: 'User', fk: 'userId' },
+  PasswordReset: { parent: 'User', fk: 'userId' },
 }
 /** Tables that belong to the platform, not to one school's records. SchoolPayment goes with the school (cascade). */
 const NOT_SCHOOL_DATA = new Set(['School', 'Plan', 'SchoolPayment'])
 
 /** Private conversations stay private: they are not part of an export, even the school admin's. */
-const EXPORT_EXCLUDED = new Set(['Conversation', 'DirectMessage', 'DmAttachment', 'ConversationRead', 'MessageBlock', 'MessageReport', 'Notification'])
+const EXPORT_EXCLUDED = new Set(['Conversation', 'DirectMessage', 'DmAttachment', 'ConversationRead', 'MessageBlock', 'MessageReport', 'Notification', 'PasswordReset', 'StorageObject'])
 /** Fields that are never exported: secrets and internal storage names. */
-const EXPORT_HIDDEN_FIELDS = new Set(['passwordHash', 'storageKey', 'logoKey'])
+const EXPORT_HIDDEN_FIELDS = new Set(['passwordHash', 'tokenHash', 'storageKey', 'logoKey'])
 /** Deleted last, in this order, because other tables point at them. */
 const DELETE_LAST = ['ParentStudentLink', 'Class', 'User']
 
@@ -111,13 +112,16 @@ export class SchoolDataService {
         const c = CHILD_TABLES[m]
         counts[m] = (await del(m).deleteMany({ where: { [c.fk]: { in: ids[c.parent] } } })).count
       }
-      for (const m of owned.filter((x) => !DELETE_LAST.includes(x))) counts[m] = (await del(m).deleteMany({ where: { schoolId } })).count
+      // StorageObject says where each file really is (main storage or Google Drive), so it stays until the files are removed below.
+      for (const m of owned.filter((x) => !DELETE_LAST.includes(x) && x !== 'StorageObject')) counts[m] = (await del(m).deleteMany({ where: { schoolId } })).count
       for (const m of DELETE_LAST) counts[m] = (await del(m).deleteMany({ where: { schoolId } })).count
       await tx.school.delete({ where: { id: schoolId } }) // its payments go with it
     }, { timeout: 120_000, maxWait: 20_000 })
 
     // The database is the record of truth; a file that cannot be removed is logged, not a reason to undo the delete.
     for (const k of keys) await deleteFile(k).catch((e) => this.log.warn(`Could not remove stored file ${k}: ${(e as Error).message}`))
+    // Any record that is left (a file that could not be removed) goes now, so nothing of the school remains.
+    counts.StorageObject = (await this.prisma.storageObject.deleteMany({ where: { schoolId } })).count
     return { counts, files: keys.length }
   }
 }

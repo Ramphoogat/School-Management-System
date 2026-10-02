@@ -14,24 +14,24 @@ export const PERMISSIONS: Record<Role, Permission[]> = {
   student: [
     'announcements:read:own_class', 'attendance:read:own', 'homework:read:own_class', 'homework:submit:own', 'resources:read:own_class',
     'results:read:own', 'fees:read:own', 'certificates:read:own', 'timetable:read:own', 'leave:request:own',
-    'chat:write:own_class', 'voice:join:own_class', 'messages:write:own_class',
+    'chat:write:own_class', 'voice:join:own_class', 'messages:write:own_class', 'books:read:own_class',
   ],
   parent: [
     'announcements:read:own_child', 'attendance:read:own_child', 'homework:read:own_child',
     'results:read:own_child', 'fees:read:own_child', 'fees:pay:own_child', 'certificates:read:own_child',
-    'timetable:read:own_child', 'leave:request:own_child', 'messages:write:own_child', 'resources:read:own_child',
+    'timetable:read:own_child', 'leave:request:own_child', 'messages:write:own_child', 'resources:read:own_child', 'chat:write:own_child',
   ],
   teacher: [
     'announcements:write:own_class', 'attendance:write:own_class', 'attendance:bulk_write:own_class',
     'homework:write:own_class', 'homework:bulk_write:own_class', 'results:write:own_class',
     'results:bulk_write:own_class', 'timetable:read:own', 'leave:request:own',
-    'chat:write:own_class', 'voice:join:own_class', 'voice:manage:own_class', 'messages:write:own_class', 'role_requests:request:school', 'timetable:read:own_class', 'resources:write:own_class',
+    'chat:write:own_class', 'voice:join:own_class', 'voice:manage:own_class', 'messages:write:own_class', 'role_requests:request:school', 'timetable:read:own_class', 'resources:write:own_class', 'books:write:own_class', 'drive:use:school',
   ],
   clerk: [
     'announcements:write:school', 'attendance:read:school', 'results:read:school',
     'fees:read:school', 'fees:write:school', 'fees:bulk_write:school', 'admissions:write:school',
     'admissions:bulk_write:school', 'timetable:read:school', 'leave:request:own',
-    'role_requests:request:school', 'certificates:bulk_write:school', 'certificates:read:school', 'idcards:bulk_write:school', 'documents:write:school', 'resources:read:school', 'voice:join:school', 'voice:manage:school', 'messages:write:school',
+    'role_requests:request:school', 'certificates:bulk_write:school', 'certificates:read:school', 'idcards:bulk_write:school', 'documents:write:school', 'resources:read:school', 'resources:write:school', 'voice:join:school', 'voice:manage:school', 'messages:write:school', 'books:write:school', 'storage:manage:school', 'drive:use:school', 'chat:write:school',
   ],
   principal: [
     'announcements:write:school', 'attendance:read:school', 'homework:read:school',
@@ -39,7 +39,7 @@ export const PERMISSIONS: Record<Role, Permission[]> = {
     'fees:bulk_approve:school', 'fees:refund:school', 'admissions:approve:school', 'admissions:bulk_approve:school',
     'timetable:write:school', 'chat:write:school', 'voice:join:school', 'voice:manage:school', 'messages:write:school', 'messages:moderate:school', 'leave:approve:school', 'leave:bulk_approve:school',
     'users:manage:school', 'users:bulk_manage:school', 'role_requests:approve:school',
-    'role_requests:bulk_approve:school', 'audit:read:school', 'classes:write:school', 'resources:read:school', 'academic:manage:school', 'documents:write:school', 'billing:read:school',
+    'role_requests:bulk_approve:school', 'audit:read:school', 'classes:write:school', 'resources:read:school', 'resources:write:school', 'academic:manage:school', 'documents:write:school', 'billing:read:school', 'books:write:school', 'books:revoke:school', 'classes:delete:school', 'storage:manage:school', 'cameras:view:school', 'cameras:manage:school', 'drive:use:school',
   ],
   admin: [
     'announcements:manage:school', 'attendance:read:school', 'homework:read:school',
@@ -47,7 +47,7 @@ export const PERMISSIONS: Record<Role, Permission[]> = {
     'admissions:approve:school', 'admissions:bulk_approve:school', 'timetable:write:school',
     'leave:read:school', 'users:manage:school', 'users:bulk_manage:school',
     'role_requests:approve:school', 'role_requests:bulk_approve:school',
-    'audit:read:school', 'classes:write:school', 'messages:moderate:school', 'branding:manage:school', 'notifications:manage:school', 'voice:join:school', 'voice:manage:school', 'resources:read:school', 'academic:manage:school', 'documents:write:school', 'billing:read:school', 'school:export:school',
+    'audit:read:school', 'classes:write:school', 'messages:moderate:school', 'branding:manage:school', 'notifications:manage:school', 'voice:join:school', 'voice:manage:school', 'resources:read:school', 'resources:write:school', 'academic:manage:school', 'documents:write:school', 'billing:read:school', 'school:export:school', 'books:write:school', 'books:revoke:school', 'classes:delete:school', 'storage:manage:school', 'cameras:view:school', 'cameras:manage:school', 'drive:use:school', 'chat:write:school',
   ],
   // Runs the platform: creates and suspends schools. It has no access to any school's own data.
   superadmin: ['schools:manage:school'],

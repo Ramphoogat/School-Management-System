@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tailwind 4 has this class and the copied shadcn components use it; Tailwind 3 does not, so the browser's own focus ring showed. */
+@layer utilities {
+  .outline-hidden { outline: 2px solid transparent; outline-offset: 2px; }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

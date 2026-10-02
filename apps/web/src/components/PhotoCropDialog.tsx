@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const VIEW_W = 240, VIEW_H = 300 // the crop window on screen, 4 wide by 5 tall like an ID photo
-const OUT_W = 400, OUT_H = 500 // what is sent: small enough to stay well under the 1 MB limit
+const OUT_W = 400, OUT_H = 500 // what is sent: kept small (a few dozen KB) so ID cards stay light, far under the 10 MB limit
 
 /**
  * Crop a chosen picture to an ID-photo shape before it is uploaded: drag to move it, slide to zoom. The result is a

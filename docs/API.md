@@ -6,7 +6,8 @@ _Generated from the controllers by `node scripts/gen-api-docs.mjs`. Do not edit 
 
 - **Base address:** `http://localhost:4000/api` in development. Every path below starts with `/api`.
 - **Format:** JSON in and out. File uploads use `multipart/form-data`. Errors look like `{ "statusCode": 400, "message": "…" }`, where `message` may be a list for validation errors.
-- **Signing in:** `POST /api/auth/login` returns `accessToken` and `refreshToken`. Send `Authorization: Bearer <accessToken>` on every other call. When a call returns 401, `POST /api/auth/refresh` with the refresh token gives a new pair.
+- **Signing in:** `POST /api/auth/login` returns `accessToken` (15 minutes) and `refreshToken` (7 days). Send `Authorization: Bearer <accessToken>` on every other call. When a call returns 401, `POST /api/auth/refresh` with the refresh token gives a new pair. A password change or reset, a deactivation and `POST /api/auth/logout-all` end every token of that person at once.
+- **Lockout:** after 10 wrong passwords for one email (or 60 from one network address) in 15 minutes, sign-in answers `429` with the minutes left, even for the right password. Wrong current-password tries on `change-password` stop after 5. `forgot-password` allows 3 requests an hour per email and 20 per network address, and always answers the same.
 - **Who may call what:** the **Permission** column is a `resource:action` pair from `packages/permissions`. It is checked by the server on every call, together with scope (own class, own children, whole school). Routes marked _checked in code_ decide inside the handler, for example "the class teacher only". A dash means the route has no permission of its own: any signed-in person may call it, and the service narrows what they get (their own class, children or school). **Public** routes need no sign-in.
 - **Schools:** every signed-in call is limited to the caller's own school. The Super Admin only reaches `/api/platform`.
 - **Lists:** the audit log takes `page` and `pageSize`. Students, admissions, invoices, certificates and leave are cut off at the school's list size (School branding → Long lists); students, admissions and invoices send the real total in the `X-Total-Count` header.
@@ -66,8 +67,11 @@ _Generated from the controllers by `node scripts/gen-api-docs.mjs`. Do not edit 
 | Method | Path | Permission | Notes |
 |---|---|---|---|
 | POST | `/api/auth/login` | **Public** | Body: `LoginDto` |
+| POST | `/api/auth/forgot-password` | **Public** | Asks for a password reset link by email. Always answers the same, whether or not the address has an account. Body: `ForgotDto` |
+| POST | `/api/auth/reset-password` | **Public** | Uses a reset link once to choose a new password. Signs the person out of every device. Body: `ResetDto` |
 | POST | `/api/auth/refresh` | **Public** | Body: `RefreshDto` |
 | POST | `/api/auth/change-password` | — | Body: `ChangePasswordDto` |
+| POST | `/api/auth/logout-all` | — |  |
 | GET | `/api/auth/me` | — |  |
 
 ## billing
@@ -75,6 +79,18 @@ _Generated from the controllers by `node scripts/gen-api-docs.mjs`. Do not edit 
 | Method | Path | Permission | Notes |
 |---|---|---|---|
 | GET | `/api/school/billing` | `billing:read` |  |
+
+## books
+
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/api/books/class/:classId` | _checked in code_ |  |
+| POST | `/api/books/class/:classId` | _checked in code_ | Multipart: the text fields (title, author, description) come before the file. Body: `BookFields` |
+| GET | `/api/books/files/:id` | _checked in code_ | Always an attachment (the browser app opens it from the downloaded copy). A student whose use was withdrawn is refused. |
+| DELETE | `/api/books/:id` | _checked in code_ |  |
+| GET | `/api/books/:id/access` | _checked in code_ | The class's students, and which of them can no longer use this book. Principal and admin only. |
+| POST | `/api/books/:id/revoke` | _checked in code_ | Body: `RevokeDto` |
+| POST | `/api/books/:id/restore` | _checked in code_ | Body: `RestoreDto` |
 
 ## certificates
 
@@ -105,6 +121,9 @@ _Generated from the controllers by `node scripts/gen-api-docs.mjs`. Do not edit 
 | POST | `/api/classes/:id/channels` | _checked in code_ | Adds a custom text channel (like chat, with its own messages). Voice channels are created from the voice page. Body: `ChannelDto` |
 | DELETE | `/api/classes/:id/channels/:channelId` | _checked in code_ | Only custom text channels can be removed; the standard ones stay. Their messages go with them. |
 | POST | `/api/classes` | `classes:write` | Body: `CreateClassDto` |
+| GET | `/api/classes/deleted` | `classes:delete` | The classes that were deleted and can be brought back. Principal and admin only. |
+| DELETE | `/api/classes/:id` | `classes:delete` | Deletes a class the way a recycle bin does: it disappears for its students, teachers and parents and from every list, but nothing is erased (members, homework, marks, files and chat stay), and it can be restored. |
+| POST | `/api/classes/:id/restore` | `classes:delete` | Brings a deleted class back exactly as it was. |
 
 ## documents
 
@@ -170,6 +189,18 @@ _Generated from the controllers by `node scripts/gen-api-docs.mjs`. Do not edit 
 | PUT | `/api/id-cards/photo/:studentId` | `idcards:bulk_write` |  |
 | GET | `/api/id-cards/photo/:studentId` | _checked in code_ |  |
 | DELETE | `/api/id-cards/photo/:studentId` | `idcards:bulk_write` |  |
+
+## import
+
+_Added by hand; `node scripts/gen-api-docs.mjs` will regenerate it from the code._
+
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/api/import/sources` | — | What the "?" button shows: which links work (Google Drive, Docs/Sheets/Slides, Dropbox, OneDrive/SharePoint, GitHub, direct), how to get one, what does not work, the size limit, whether this person may use links (not students) and, when Google Drive is connected, the address to share a private Drive file with. |
+
+Adding a file **from a link** needs no route of its own: `POST /api/documents`, `POST /api/resources/class/:classId`,
+`POST /api/books/class/:classId` and `POST /api/homework/:id/files` also accept a JSON body with `url` (plus the usual fields such as
+`title`) instead of a file upload. The permission is the same as for an upload; students are always refused.
 
 ## insights
 
@@ -288,6 +319,16 @@ _Generated from the controllers by `node scripts/gen-api-docs.mjs`. Do not edit 
 | Method | Path | Permission | Notes |
 |---|---|---|---|
 | GET | `/api/school/export` | `school:export` |  |
+
+## storage
+
+_Added by hand; `node scripts/gen-api-docs.mjs` will regenerate it from the code._
+
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/api/storage` | `storage:manage` | Where this school's new files go now and why, the school's chosen mode (`auto`, `primary`, `drive`), the room used in the main storage (all schools on the server, its limit, this school's share) and in Google Drive (connected or not, account, quota, this school's share, the address to share a private file with). Clerk, principal and admin. |
+| PUT | `/api/storage/mode` | `storage:manage` | Chooses where this school's new files go. `drive` is refused while Google Drive is not connected. Recorded in the audit log. Body: `{ mode }` |
+| POST | `/api/storage/check` | `storage:manage` | Saves, reads back and deletes a small test file in the main storage and in Google Drive, and reports each step. |
 
 ## students
 

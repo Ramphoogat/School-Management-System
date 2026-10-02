@@ -63,7 +63,7 @@ export class AdmissionsController {
   @Post()
   @RequirePermission('admissions', 'write')
   async create(@CurrentUser() user: AuthUser, @Body() dto: AdmissionDto) {
-    const cls = await this.prisma.class.findFirst({ where: { id: dto.classId, schoolId: user.schoolId } })
+    const cls = await this.prisma.class.findFirst({ where: { id: dto.classId, schoolId: user.schoolId, deletedAt: null } })
     if (!cls) throw new BadRequestException('Unknown class')
     const a = await this.insert(user, { ...dto, studentEmail: dto.studentEmail.toLowerCase(), parentEmail: dto.parentEmail.toLowerCase() })
     if (typeof a === 'string') throw new BadRequestException(a)

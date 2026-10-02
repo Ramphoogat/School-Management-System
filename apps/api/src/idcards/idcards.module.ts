@@ -14,8 +14,8 @@ class BulkIdCardsDto {
   @IsArray() @ArrayNotEmpty() @ArrayMaxSize(300) @IsString({ each: true }) studentIds: string[]
 }
 
-/** Photos are cropped and shrunk in the browser, so a real one is well under this. */
-const MAX_PHOTO_BYTES = 1024 * 1024
+/** Photos are cropped and shrunk in the browser, so a real one is far smaller than this; the limit only guards the server. */
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024
 
 /** Stable card number: the same student always gets the same number, so a reprint matches the original. */
 export const cardNumber = (studentId: string, joinedAt: Date) => `ID-${joinedAt.getUTCFullYear()}-${studentId.slice(-6).toUpperCase()}`
@@ -82,12 +82,12 @@ export class IdCardPhotosController {
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_PHOTO_BYTES, files: 1 } }))
   async upload(@CurrentUser() user: AuthUser, @Param('studentId') studentId: string, @UploadedFile() file: Upload | undefined) {
     await this.studentOf(user, studentId)
-    if (!file) throw new BadRequestException('Choose a photo (JPG or PNG, up to 1 MB)')
+    if (!file) throw new BadRequestException('Choose a photo (JPG or PNG, up to 10 MB)')
     const type = judgeUpload(file)
     const ext = file.originalname.split('.').pop()?.toLowerCase()
     if (!type || !['png', 'jpg', 'jpeg'].includes(ext ?? '')) throw new BadRequestException('The photo must be a JPG or PNG picture')
     const key = newKey()
-    await putFile(key, file.buffer)
+    await putFile(key, file.buffer, { schoolId: user.schoolId })
     try {
       const old = await this.prisma.studentPhoto.findUnique({ where: { studentId } })
       const row = await this.prisma.studentPhoto.upsert({

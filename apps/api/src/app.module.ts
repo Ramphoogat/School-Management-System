@@ -25,13 +25,19 @@ import { DocumentsModule } from './documents/documents.module'
 import { BillingModule } from './billing/billing.module'
 import { SchoolDataModule } from './school-data/school-data.module'
 import { AcademicModule } from './academic/academic.module'
+import { CamerasModule } from './cameras/cameras.module'
+import { McpModule } from './mcp/mcp.module'
 import { ResourcesModule } from './resources/resources.module'
+import { BooksModule } from './books/books.module'
 import { IdCardsModule } from './idcards/idcards.module'
 import { CertificatesModule } from './certificates/certificates.module'
 import { LeaveModule } from './leave/leave.module'
 import { InsightsModule } from './insights/insights.module'
+import { StorageModule } from './storage/storage.module'
+import { DriveModule } from './storage/drive.module'
+import { ImportModule } from './import/import.module'
 
 @Module({
-  imports: [PrismaModule, EventsModule, LiveModule, AuditModule, PlatformModule, AuthModule, RoleRequestsModule, LinksModule, ClassesModule, UsersModule, AnnouncementsModule, AttendanceModule, NotificationsModule, HomeworkModule, TimetableModule, ChatModule, ExamsModule, VoiceModule, MessagesModule, AdmissionsModule, StudentsModule, FeesModule, CertificatesModule, IdCardsModule, ResourcesModule, AcademicModule, BillingModule, SchoolDataModule, DocumentsModule, LeaveModule, InsightsModule],
+  imports: [PrismaModule, EventsModule, LiveModule, AuditModule, StorageModule, ImportModule, PlatformModule, AuthModule, RoleRequestsModule, LinksModule, ClassesModule, UsersModule, AnnouncementsModule, AttendanceModule, NotificationsModule, HomeworkModule, TimetableModule, ChatModule, ExamsModule, VoiceModule, MessagesModule, AdmissionsModule, StudentsModule, FeesModule, CertificatesModule, IdCardsModule, ResourcesModule, BooksModule, AcademicModule, BillingModule, SchoolDataModule, DocumentsModule, LeaveModule, InsightsModule, CamerasModule, DriveModule, McpModule],
 })
 export class AppModule {}

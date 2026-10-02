@@ -41,7 +41,7 @@ async function main() {
     })
   }
 
-  for (const type of ['announcements', 'attendance', 'homework', 'chat', 'voice', 'resources', 'grades']) {
+  for (const type of ['announcements', 'attendance', 'homework', 'chat', 'voice', 'resources', 'books', 'grades']) {
     await prisma.channel.upsert({
       where: { classId_type: { classId: cls.id, type } },
       update: {},

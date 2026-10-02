@@ -19,7 +19,7 @@ const tempPassword = () => randomBytes(9).toString('base64url')
 const RESERVED = new Set(['www', 'app', 'api', 'admin', 'platform', 'superadmin', 's', 'static', 'assets', 'login', 'mail', 'support', 'help', 'docs', 'status', 'school', 'schools', 'demo', 'test'])
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])$/
 
-const MAX_LOGO_BYTES = 512 * 1024
+const MAX_LOGO_BYTES = 5 * 1024 * 1024
 
 class CreateSchoolDto {
   @IsString() @MinLength(2) @MaxLength(80) name: string
@@ -190,12 +190,12 @@ export class SchoolBrandingController {
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_LOGO_BYTES, files: 1 } }))
   async logo(@CurrentUser() user: AuthUser, @UploadedFile() file: Upload | undefined) {
     const s = await this.mine(user)
-    if (!file) throw new BadRequestException('Choose a logo (PNG or JPG, up to 500 KB)')
+    if (!file) throw new BadRequestException('Choose a logo (PNG or JPG, up to 5 MB)')
     const type = judgeUpload(file)
     const ext = file.originalname.split('.').pop()?.toLowerCase()
     if (!type || !['png', 'jpg', 'jpeg'].includes(ext ?? '')) throw new BadRequestException('The logo must be a PNG or JPG picture')
     const key = newKey()
-    await putFile(key, file.buffer)
+    await putFile(key, file.buffer, { schoolId: s.id, forcePrimary: true }) // shown on the public sign-in page: keep it in the fast main storage
     const updated = await this.prisma.school.update({ where: { id: s.id }, data: { logoKey: key, logoMime: type.mime, logoUpdatedAt: new Date() } })
     if (s.logoKey) await deleteFile(s.logoKey)
     await this.audit.log(this.prisma, { schoolId: s.id, actorId: user.id, action: 'school.logo_updated', resource: 'school', resourceId: s.id, meta: { name: cleanName(file.originalname), size: file.size } })
@@ -308,7 +308,7 @@ export class PlatformController {
     const admin = await this.prisma.user.findFirst({ where: { id: userId, schoolId: id, role: 'admin' }, select: { id: true, name: true, email: true } })
     if (!admin) throw new NotFoundException('Admin not found')
     const pw = tempPassword()
-    await this.prisma.user.update({ where: { id: userId }, data: { passwordHash: await bcrypt.hash(pw, 10), mustChangePassword: true, active: true } })
+    await this.prisma.user.update({ where: { id: userId }, data: { passwordHash: await bcrypt.hash(pw, 10), mustChangePassword: true, active: true, tokenVersion: { increment: 1 } } })
     await this.audit.log(this.prisma, { schoolId: id, actorId: user.id, action: 'school.admin_password_reset', resource: 'user', resourceId: userId })
     return { admin, tempPassword: pw }
   }

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { io, type Socket } from 'socket.io-client'
-import { tokens } from './api'
+import { socketAuth } from './api'
 import { useAuth } from './auth'
 
 export type MyStatus = 'online' | 'invisible'
@@ -33,7 +33,7 @@ export function PresenceProvider({ children }: { children: ReactNode }) {
     status.current = saved
     setStatus(saved)
     // A function for auth, so a reconnect after the token was refreshed uses the newest one.
-    const s = io(import.meta.env.VITE_API_URL ?? 'http://localhost:4000', { auth: (cb) => cb({ token: tokens.access, status: status.current }) })
+    const s = io(import.meta.env.VITE_API_URL ?? 'http://localhost:4000', { auth: socketAuth(() => ({ status: status.current })) })
     sock.current = s
     let connectedBefore = false
     s.on('connect', () => {

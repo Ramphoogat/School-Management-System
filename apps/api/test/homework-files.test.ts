@@ -58,8 +58,8 @@ describe('homework files: uploading', () => {
     expect((await send(c.teacher, assignmentId, Buffer.from('a\u0000b'), 'notes.txt')).status).toBe(400)
   })
 
-  it('rejects files over 10 MB', async () => {
-    const big = Buffer.concat([Buffer.from('%PDF'), Buffer.alloc(10 * 1024 * 1024 + 10)])
+  it('rejects files over 100 MB', async () => {
+    const big = Buffer.concat([Buffer.from('%PDF'), Buffer.alloc(100 * 1024 * 1024 + 10)])
     // The server may cut the connection as soon as the limit is hit, so a reset counts as a refusal too.
     const status = await send(c.teacher, assignmentId, big, 'big.pdf').then((r) => r.status, () => 413)
     expect(status).toBe(413)

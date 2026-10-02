@@ -1,5 +1,5 @@
 import { io, type Socket } from 'socket.io-client'
-import { tokens } from './api'
+import { socketAuth } from './api'
 
 /**
  * Peer-to-peer (mesh) voice, camera and screen sharing. The server only introduces people and relays
@@ -62,7 +62,7 @@ export class CallClient {
     this.channelId = channelId
     this.onChange = onChange
     this.onClosed = onClosed
-    this.socket = io(API, { auth: { token: tokens.access }, reconnection: false })
+    this.socket = io(API, { auth: socketAuth(), reconnection: false })
     this.socket.on('disconnect', () => { this.connected = false; if (!this.ended) this.finish('You were disconnected from the call.') })
     this.socket.on('voice:muted', ({ by }: { by: string }) => { this.setMicEnabled(false); this.onMuted?.(by) })
     this.socket.on('voice:removed', ({ by }: { by: string }) => this.finish(`${by} removed you from the call.`))

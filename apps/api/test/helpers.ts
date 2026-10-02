@@ -5,6 +5,8 @@ import bcrypt from 'bcryptjs'
 import request from 'supertest'
 import { PrismaClient, type Role } from '@school/db'
 import { AppModule } from '@dist/app.module'
+import { applySecurity } from '@dist/common/security'
+import type { NestExpressApplication } from '@nestjs/platform-express'
 
 export const PASSWORD = 'password123'
 export const prisma = new PrismaClient()
@@ -12,6 +14,7 @@ export const prisma = new PrismaClient()
 export async function createApp(): Promise<INestApplication> {
   const mod = await Test.createTestingModule({ imports: [AppModule] }).compile()
   const app = mod.createNestApplication({ rawBody: true }) // as in main.ts: the webhook signature covers the exact bytes
+  applySecurity(app as NestExpressApplication)
   app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
   await app.init()

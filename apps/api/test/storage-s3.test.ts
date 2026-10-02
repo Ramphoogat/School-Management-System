@@ -2,6 +2,11 @@ import { createServer, type Server } from 'node:http'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { signRequest } from '@dist/storage/s3'
 import { deleteFile, getFile, newKey, putFile } from '@dist/storage/storage'
+import { s3Config } from '@dist/storage/s3'
+import { checkBucket, copyFolderToBucket } from '@dist/storage/tools'
+import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 describe('S3 request signing', () => {
   // The worked example in Amazon's own documentation ("Example: GET Object"), so this is checked against a published answer
@@ -72,6 +77,57 @@ describe('object storage as the file store', () => {
     // The signature covers the real file content.
     expect(seen[0].hash).toMatch(/^[0-9a-f]{64}$/)
     expect(seen[0].hash).not.toBe(seen[1].hash)
+  })
+
+  it('the bucket check saves, reads, deletes and confirms, and leaves nothing behind', async () => {
+    const steps = await checkBucket(s3Config()!)
+    expect(steps.map((s) => [s.step, s.ok])).toEqual([['save a file', true], ['read it back and compare', true], ['delete it', true], ['confirm it is gone', true]])
+    expect([...objects.keys()].filter((k) => k.includes('_check/'))).toEqual([])
+  })
+
+  it('the bucket check names the step that fails', async () => {
+    const good = process.env.S3_ACCESS_KEY_ID
+    process.env.S3_ACCESS_KEY_ID = 'wrong-key'
+    const steps = await checkBucket(s3Config()!)
+    process.env.S3_ACCESS_KEY_ID = good
+    expect(steps[0]).toMatchObject({ step: 'save a file', ok: false })
+    expect(steps[0].error).toMatch(/403/)
+  })
+
+  it('copies a folder of existing files into the bucket under the same names, and leaves the originals', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'uploads-'))
+    try {
+      await mkdir(join(dir, 'subfolder'))
+      await writeFile(join(dir, 'a1b2-file-one'), Buffer.from('one'))
+      await writeFile(join(dir, 'c3d4-file-two'), Buffer.alloc(5000, 7))
+      await writeFile(join(dir, '.gitkeep'), 'ignored')
+      const dry = await copyFolderToBucket(dir, s3Config()!, { dryRun: true })
+      expect(dry).toMatchObject({ found: 2, copied: 0, dryRun: true })
+      expect([...objects.keys()].some((k) => k.includes('a1b2-file-one'))).toBe(false)
+
+      const r = await copyFolderToBucket(dir, s3Config()!)
+      expect(r).toMatchObject({ found: 2, copied: 2, bytes: 5003, failed: [] })
+      expect(objects.get('/school-files/prod/a1b2-file-one')?.toString()).toBe('one')
+      expect(objects.get('/school-files/prod/c3d4-file-two')?.length).toBe(5000)
+      expect((await getFile('a1b2-file-one')).toString()).toBe('one') // the app can now read it through the bucket
+
+      const again = await copyFolderToBucket(dir, s3Config()!) // safe to repeat
+      expect(again).toMatchObject({ found: 2, copied: 2, failed: [] })
+      objects.delete('/school-files/prod/a1b2-file-one'); objects.delete('/school-files/prod/c3d4-file-two')
+    } finally { await rm(dir, { recursive: true, force: true }) }
+  })
+
+  it('reports the files it could not copy and carries on with the rest', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'uploads-'))
+    const good = process.env.S3_ACCESS_KEY_ID
+    try {
+      await writeFile(join(dir, 'x1'), Buffer.from('x'))
+      process.env.S3_ACCESS_KEY_ID = 'nope'
+      const r = await copyFolderToBucket(dir, s3Config()!)
+      expect(r.copied).toBe(0)
+      expect(r.failed).toHaveLength(1)
+      expect(r.failed[0]).toMatchObject({ name: 'x1' })
+    } finally { process.env.S3_ACCESS_KEY_ID = good; await rm(dir, { recursive: true, force: true }) }
   })
 
   it('deleting a file that is not there is fine', async () => {

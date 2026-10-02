@@ -24,11 +24,16 @@ beforeAll(async () => {
 afterAll(async () => { await app.close(); await prisma.$disconnect() })
 
 describe('resources channel', () => {
-  it('only the class teacher uploads', async () => {
-    for (const r of ['teacher2', 'student', 'parent', 'clerk', 'principal', 'admin'] as const) expect((await send(c[r], w.classA, PDF, 'x.pdf')).status, r).toBe(403)
+  it('the class teacher and school staff upload', async () => {
+    for (const r of ['teacher2', 'student', 'parent'] as const) expect((await send(c[r], w.classA, PDF, 'x.pdf')).status, r).toBe(403)
     const up = await send(c.teacher, w.classA, PDF, 'syllabus.pdf')
     expect(up.status).toBe(201)
     expect(up.body.name).toBe('syllabus.pdf')
+    for (const r of ['clerk', 'principal', 'admin'] as const) {
+      const staff = await send(c[r], w.classA, PDF, `${r}.pdf`)
+      expect(staff.status, r).toBe(201)
+      expect((await c[r].delete(`/resources/files/${staff.body.id}`)).status, r).toBe(200)
+    }
   })
 
   it('class members, their parents, the teacher and school staff can list and download; others cannot', async () => {
@@ -68,16 +73,16 @@ describe('resources channel', () => {
     expect((await request(app.getHttpServer()).post(`/api/resources/class/${w.classA}`).set('authorization', `Bearer ${c.teacher.token}`)).status).toBe(400)
     expect((await send(c.teacher, w.classA, Buffer.from('MZ'), 'tool.exe')).status).toBe(400)
     expect((await send(c.teacher, w.classA, Buffer.from('<html>'), 'page.pdf')).status).toBe(400)
-    const big = Buffer.concat([Buffer.from('%PDF'), Buffer.alloc(10 * 1024 * 1024 + 10)])
+    const big = Buffer.concat([Buffer.from('%PDF'), Buffer.alloc(100 * 1024 * 1024 + 10)])
     expect(await send(c.teacher, w.classA, big, 'big.pdf').then((r) => r.status, () => 413)).toBe(413)
     expect(await prisma.resourceFile.count({ where: { name: 'big.pdf' } })).toBe(0)
   })
 
-  it('only the class teacher deletes, and the file is gone afterwards', async () => {
+  it('only the class teacher and school staff delete, and the file is gone afterwards', async () => {
     const f = await prisma.resourceFile.findFirstOrThrow({ where: { classId: w.classA } })
-    for (const r of ['student', 'parent', 'teacher2', 'clerk', 'principal'] as const) expect((await c[r].delete(`/resources/files/${f.id}`)).status, r).toBe(403)
+    for (const r of ['student', 'parent', 'teacher2'] as const) expect((await c[r].delete(`/resources/files/${f.id}`)).status, r).toBe(403)
     expect((await c.teacher.delete(`/resources/files/${f.id}`)).status).toBe(200)
     expect((await download(c.student, f.id)).status).toBe(404)
-    expect(await prisma.auditLog.count({ where: { action: { in: ['resource.uploaded', 'resource.deleted'] } } })).toBe(2)
+    expect(await prisma.auditLog.count({ where: { action: { in: ['resource.uploaded', 'resource.deleted'] } } })).toBe(8) // the teacher's upload and delete, and three staff uploads and deletes
   })
 })

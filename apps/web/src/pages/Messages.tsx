@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { toast } from 'sonner'
-import { ArrowLeft, Ban, Check, CheckCheck, FileText, Flag, MessageSquarePlus, MoreHorizontal, Paperclip, Pencil, Search, Send, Trash2, X } from 'lucide-react'
+import { ArrowLeft, Ban, Bell, Check, CheckCheck, FileText, Flag, MessageSquarePlus, MoreHorizontal, Paperclip, Pencil, Search, Send, Trash2, X } from 'lucide-react'
 import { api, downloadFile, uploadFile } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { useMessages, type LiveMessage } from '@/lib/messages'
@@ -356,7 +356,7 @@ function ThreadView({ id, onBack, onChanged }: { id: string; onBack: () => void;
           )}
           <div className="flex items-end gap-2">
             <input ref={fileInput} type="file" multiple hidden accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.txt" onChange={pick} />
-            <Button type="button" variant="ghost" size="icon" onClick={() => fileInput.current?.click()} disabled={uploading || pending.length >= 5} aria-label={tr('Attach a file')} title={tr('Attach a file (PDF, image, Word, text; up to 10 MB)')}><Paperclip className="h-5 w-5" /></Button>
+            <Button type="button" variant="ghost" size="icon" onClick={() => fileInput.current?.click()} disabled={uploading || pending.length >= 5} aria-label={tr('Attach a file')} title={tr('Attach a file (PDF, image, Word, text; up to 100 MB)')}><Paperclip className="h-5 w-5" /></Button>
             <Textarea rows={1} value={text} maxLength={2000} onChange={(e) => onType(e.target.value)} onKeyDown={onKey} placeholder={`Message ${thread.other.name.split(' ')[0]}…`} className="max-h-32 min-h-10 resize-none" aria-label={tr('Message')} />
             <Button type="submit" size="icon" disabled={(!text.trim() && pending.length === 0) || busy || uploading} aria-label={tr('Send')}><Send className="h-4 w-4" /></Button>
           </div>
@@ -397,7 +397,10 @@ export default function Messages() {
       <aside className={`${active ? 'hidden md:flex' : 'flex'} w-full shrink-0 flex-col border-r md:w-80`}>
         <div className="flex items-center justify-between border-b p-3">
           <h1 className="text-lg font-semibold">{t('Messages')}</h1>
-          <Button size="sm" onClick={() => setNewOpen(true)}><MessageSquarePlus className="mr-1 h-4 w-4" /> {t('New')}</Button>
+          <div className="flex items-center gap-1">
+            <Button asChild size="icon" variant="ghost" title={t('Notifications')} aria-label={t('Notifications')}><Link to="/notifications"><Bell className="h-4 w-4" /></Link></Button>
+            <Button size="sm" onClick={() => setNewOpen(true)}><MessageSquarePlus className="mr-1 h-4 w-4" /> {t('New')}</Button>
+          </div>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           {list === null && <p className="p-4 text-sm text-muted-foreground">{t('Loading…')}</p>}

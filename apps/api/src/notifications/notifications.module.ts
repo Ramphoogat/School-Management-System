@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, Injectable, Logger, Module, NotFoundException, OnModuleDestroy, OnModuleInit, Param, Post, Put, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, Injectable, Logger, Module, NotFoundException, OnModuleDestroy, OnModuleInit, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 import { IsBoolean, IsIn, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator'
 import { roleCan } from '@school/permissions'
 import { PrismaService } from '../prisma/prisma.module'
@@ -315,8 +315,15 @@ export class NotificationsController {
   constructor(private prisma: PrismaService, private audit: AuditService) {}
 
   @Get()
-  list(@CurrentUser() user: AuthUser) {
-    return this.prisma.notification.findMany({ where: { userId: user.id, channel: 'in_app' }, orderBy: { createdAt: 'desc' }, take: 50 })
+  list(@CurrentUser() user: AuthUser, @Query('limit') limit?: string) {
+    const take = Math.min(500, Math.max(1, Number(limit) || 50))
+    return this.prisma.notification.findMany({ where: { userId: user.id, channel: 'in_app' }, orderBy: { createdAt: 'desc' }, take })
+  }
+
+  @Post('read-all')
+  async readAll(@CurrentUser() user: AuthUser) {
+    const r = await this.prisma.notification.updateMany({ where: { userId: user.id, channel: 'in_app', readAt: null }, data: { readAt: new Date() } })
+    return { ok: true, count: r.count }
   }
 
   @Post(':id/read')

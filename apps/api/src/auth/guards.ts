@@ -28,22 +28,30 @@ export class AuthGuard implements CanActivate {
 
   /** Verify a JWT and load the user with fresh role and scope. Also used by the chat gateway. */
   async authenticate(token: string): Promise<AuthUser> {
-    let payload: { sub: string }
+    let payload: { sub: string; tv?: number }
     try {
       payload = await this.jwt.verifyAsync(token, { secret: process.env.JWT_SECRET })
     } catch {
       throw new UnauthorizedException()
     }
+    return this.load(payload.sub, payload.tv ?? 0)
+  }
+
+  /** Loads a person with their current role and scope. Pass the token version to check it; leave it out for other kinds of key. */
+  async load(id: string, tokenVersion?: number): Promise<AuthUser> {
     // Load role and scope from the DB on every request so revocations apply immediately.
     const u = await this.prisma.user.findUnique({
-      where: { id: payload.sub },
+      where: { id },
       include: {
-        memberships: { select: { classId: true } },
+        // A deleted class no longer counts: its students and teachers lose access to it straight away.
+        memberships: { where: { class: { deletedAt: null } }, select: { classId: true } },
         asParent: { where: { status: 'approved' }, select: { studentId: true } },
         school: { select: { active: true, isPlatform: true } },
       },
     })
     if (!u || !u.active) throw new UnauthorizedException()
+    // "Sign out everywhere", a password change or a reset raises this number; older tokens stop working.
+    if (tokenVersion !== undefined && tokenVersion !== u.tokenVersion) throw new UnauthorizedException()
     // A suspended school is locked out straight away, including anyone already signed in.
     if (!u.school.active && !u.school.isPlatform) throw new UnauthorizedException()
     const user: AuthUser = {

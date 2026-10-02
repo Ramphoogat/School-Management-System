@@ -27,7 +27,7 @@ class MonitorDto {
   @IsOptional() @IsString() studentId?: string | null
 }
 
-const DEFAULT_CHANNELS = ['announcements', 'attendance', 'homework', 'chat', 'voice', 'resources', 'grades']
+const DEFAULT_CHANNELS = ['announcements', 'attendance', 'homework', 'chat', 'voice', 'resources', 'books', 'grades']
 
 @Controller('classes')
 @UseGuards(AuthGuard, PermissionGuard)
@@ -50,20 +50,63 @@ export class ClassesController {
   private async visible(user: AuthUser) {
     const include = { channels: true, _count: { select: { members: true } } }
     if (['principal', 'admin', 'clerk'].includes(user.role)) {
-      return this.prisma.class.findMany({ where: { schoolId: user.schoolId }, include, orderBy: { name: 'asc' } })
+      return this.prisma.class.findMany({ where: { schoolId: user.schoolId, deletedAt: null }, include, orderBy: { name: 'asc' } })
     }
     const classIds = new Set(user.classIds ?? [])
     if (user.role === 'parent' && user.linkedStudentIds?.length) {
       const ms = await this.prisma.classMember.findMany({ where: { userId: { in: user.linkedStudentIds } }, select: { classId: true } })
       ms.forEach((m) => classIds.add(m.classId))
     }
-    return this.prisma.class.findMany({ where: { schoolId: user.schoolId, id: { in: [...classIds] } }, include, orderBy: { name: 'asc' } })
+    // Deleted classes are hidden from everyone here; the principal and admin see them under "Deleted classes".
+    return this.prisma.class.findMany({ where: { schoolId: user.schoolId, deletedAt: null, id: { in: [...classIds] } }, include, orderBy: { name: 'asc' } })
   }
 
+  /** A class of this school that has not been deleted. */
   private async ownClass(user: AuthUser, id: string) {
-    const cls = await this.prisma.class.findFirst({ where: { id, schoolId: user.schoolId } })
+    const cls = await this.prisma.class.findFirst({ where: { id, schoolId: user.schoolId, deletedAt: null } })
     if (!cls) throw new NotFoundException('Class not found')
     return cls
+  }
+
+  /** The classes that were deleted and can be brought back. Principal and admin only. */
+  @Get('deleted')
+  @RequirePermission('classes', 'delete')
+  async deleted(@CurrentUser() user: AuthUser) {
+    const rows = await this.prisma.class.findMany({
+      where: { schoolId: user.schoolId, deletedAt: { not: null } },
+      orderBy: { deletedAt: 'desc' },
+      include: { _count: { select: { members: true } } },
+    })
+    const ids = [...new Set(rows.map((r) => r.deletedById).filter(Boolean))] as string[]
+    const people = ids.length ? await this.prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, name: true } }) : []
+    const who = new Map(people.map((p) => [p.id, p.name]))
+    return rows.map((r) => ({ id: r.id, name: r.name, deletedAt: r.deletedAt, deletedByName: r.deletedById ? who.get(r.deletedById) ?? null : null, members: r._count.members }))
+  }
+
+  /**
+   * Deletes a class the way a recycle bin does: it disappears for its students, teachers and parents and from every list,
+   * but nothing is erased (members, homework, marks, files and chat stay), and it can be restored.
+   */
+  @Delete(':id')
+  @RequirePermission('classes', 'delete')
+  async remove(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    const cls = await this.ownClass(user, id)
+    const members = await this.prisma.classMember.count({ where: { classId: id } })
+    await this.prisma.class.update({ where: { id }, data: { deletedAt: new Date(), deletedById: user.id } })
+    await this.audit.log(this.prisma, { schoolId: user.schoolId, actorId: user.id, action: 'class.deleted', resource: 'class', resourceId: id, meta: { name: cls.name, members } })
+    return { ok: true, id, name: cls.name }
+  }
+
+  /** Brings a deleted class back exactly as it was. */
+  @Post(':id/restore')
+  @RequirePermission('classes', 'delete')
+  async restore(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    const cls = await this.prisma.class.findFirst({ where: { id, schoolId: user.schoolId } })
+    if (!cls) throw new NotFoundException('Class not found')
+    if (!cls.deletedAt) throw new BadRequestException('This class is not deleted')
+    await this.prisma.class.update({ where: { id }, data: { deletedAt: null, deletedById: null } })
+    await this.audit.log(this.prisma, { schoolId: user.schoolId, actorId: user.id, action: 'class.restored', resource: 'class', resourceId: id, meta: { name: cls.name } })
+    return { ok: true, id, name: cls.name }
   }
 
   /** Who is in the class, who is the class teacher, and who could still be added. */
@@ -187,10 +230,15 @@ export class ClassesController {
   @Post()
   @RequirePermission('classes', 'write')
   async create(@CurrentUser() user: AuthUser, @Body() dto: CreateClassDto) {
+    const name = dto.name.trim()
+    if (!name) throw new BadRequestException('Give the class a name')
+    // A class's name stays reserved while it is deleted, so say so instead of failing with a database error.
+    const same = await this.prisma.class.findFirst({ where: { schoolId: user.schoolId, name: { equals: name, mode: 'insensitive' } } })
+    if (same) throw new BadRequestException(same.deletedAt ? `A class called "${same.name}" was deleted. Restore it from "Deleted classes", or choose a different name.` : `A class called "${same.name}" already exists.`)
     const cls = await this.prisma.class.create({
       data: {
         schoolId: user.schoolId,
-        name: dto.name,
+        name,
         channels: { create: DEFAULT_CHANNELS.map((t) => ({ type: t, name: t })) },
       },
     })

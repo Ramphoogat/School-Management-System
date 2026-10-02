@@ -19,6 +19,8 @@ needed for that feature. All settings live in the root `.env` file (copy `.env.e
 | Razorpay (online fee payment, refunds, webhook) | Optional | **Yes**, a Razorpay account | Built; signature check, refunds and webhook tested against a stand-in, **not tested against Razorpay** (no keys yet) |
 | File storage (uploads) | Required (disk) or optional (bucket) | Disk: no. S3, R2 etc.: **yes**, a bucket and keys | Built. Local disk by default; S3-compatible bucket if `S3_BUCKET` is set. Bucket mode **not tested against a real provider** |
 | Virus scanning (ClamAV) | Optional | No account; you run the scanner | Built; off unless `CLAMAV_HOST` is set. **Not tested against a real ClamAV** |
+| Google Drive (extra storage) | Optional | **Yes**, a Google Cloud project and a service account (or a person's sign-in) | Built, with automatic switch-over when the main storage is full; **never tried against real Google** (section 4d) |
+| Adding files from a link | Built in | No (Drive links work best with 4d) | Built; **never tried against the real sites** (section 4e) |
 | TURN relay (voice) | Optional, likely needed | **Yes**, a provider or your own server | Wiring built; **never tried with a real relay** (section 10) |
 | Super Admin and multi-school | Required for the platform owner | No, two settings in `.env` | Built and tested (section 11) |
 | Domain name, server and HTTPS | Required for going live | Yes | See `docs/DEPLOYMENT.md` |
@@ -137,6 +139,14 @@ by hand from the Fees page.
 - It uses the **server's clock and time zone**, so set the server to the school's zone.
 - Reminders need working email (or WhatsApp) to reach anyone; failures show in the Delivery log.
 
+## 3c. Password reset needs email
+
+The "Forgot your password?" link on the sign-in page emails a one-time link (valid 60 minutes, usable once). **It only works if email
+(section 3) is set up.** Without `EMAIL_HOST`, the page still says "check your email" (so it never reveals who has an account), but
+nothing is sent, and the API log says so. Until email works, an admin can reset a password from Users (a temporary password is shown
+once). The link points at the first address in `WEB_ORIGIN`, so that must be the real https address. People may ask three times an
+hour per address.
+
 ## 4. Optional: WhatsApp (Meta WhatsApp Business Cloud API)
 
 Sends urgent alerts and absence alerts. **If the two required values below are empty, WhatsApp is off**
@@ -177,9 +187,22 @@ Things to know:
 
 ## 4b. Optional: File storage (disk or a bucket)
 
-Homework files, class resources, school documents, message attachments, ID card photos and school logos are stored through one
+Homework files, class resources, books, school documents, message attachments, ID card photos and school logos are stored through one
 small piece of code (`apps/api/src/storage/storage.ts`). Files are always checked first: only PDF, images, Word and text files
-up to 10 MB are accepted, and the file's real content must match its name.
+are accepted, and the file's real content must match its name. The limit is **100 MB** for homework, resources, books, documents
+and message attachments (one setting, `MAX_FILE_BYTES` in `apps/api/src/storage/upload-rules.ts`); ID card photos are limited to
+10 MB (`MAX_PHOTO_BYTES` in `apps/api/src/idcards/idcards.module.ts`; the browser crops and shrinks them first, so real ones are
+tiny) and school logos to 5 MB (`MAX_LOGO_BYTES` in `apps/api/src/platform/platform.module.ts`). A large logo makes the public
+sign-in page slower to load, so a small one is still better.
+
+Things that grow with a 100 MB limit:
+- **Memory:** an upload is held in the API's memory while it is checked, scanned and stored, so several large uploads at once need
+  that much spare RAM (plan on 100 MB per upload in progress, plus the normal load).
+- **Nginx:** `client_max_body_size` must be at least `105m` (see `docs/DEPLOYMENT.md`), or large uploads are refused with 413.
+- **Virus scanning:** ClamAV refuses very large streams by default (its `StreamMaxLength` is 25 MB) and the app waits at most 20
+  seconds for a scan. If you use ClamAV, raise `StreamMaxLength` in `clamd.conf` to at least 100M (and `MaxFileSize`, `MaxScanSize`),
+  and raise `CLAMAV_TIMEOUT_MS` (for example to `120000`). Otherwise large uploads will be refused as "scanner unavailable".
+- **Storage cost:** bigger files fill the disk or the bucket faster (R2 free allowance is 10 GB).
 
 **Option A, this server's disk (the default, no account).** Files go into `UPLOAD_DIR` (default `./uploads`).
 - On a real server set it to a folder outside the code, for example `UPLOAD_DIR=/var/lib/school-uploads`, owned by the user
@@ -187,8 +210,51 @@ up to 10 MB are accepted, and the file's real content must match its name.
 - **Back this folder up with the database**, and restore them together. Losing it means every download says "file not found".
 - A second server cannot see this disk, so this option means one server only.
 
-**Option B, an S3-compatible bucket** (Amazon S3, Cloudflare R2, MinIO, DigitalOcean Spaces, Backblaze B2). Set the bucket and keys
-and the app uses it instead of the disk:
+**Recommended bucket: Cloudflare R2.** Files here are downloaded again and again (homework, documents, photos), and R2 charges
+**nothing for downloads** (Amazon S3 charges per GB), stores at about two thirds of S3's price, and has a permanent 10 GB free
+allowance. Choose Amazon S3 instead only if you already run on AWS or need data kept in Mumbai (`ap-south-1`); R2 has no India-only
+choice. (Prices and limits change: confirm on the provider's pricing page.)
+
+### Setting up Cloudflare R2, step by step
+1. Create a Cloudflare account at cloudflare.com and, in the dashboard, open **R2 Object Storage**. R2 asks for a payment card
+   even to use the free allowance; you are not charged inside it.
+2. **Create bucket.** Name it, for example, `school-files`. Leave it **private** (do not turn on the public address or a custom
+   public domain): the app hands files out itself after checking who is asking.
+3. On the R2 page choose **Manage API tokens -> Create API token**. Permission **Object Read & Write**, and under "Specify bucket(s)"
+   pick only `school-files`. Create it, then copy the **Access Key ID**, the **Secret Access Key** (shown once) and the
+   **S3 endpoint** (it looks like `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`).
+4. Put them in `.env` on the server (never in the web app, never in a chat or a repository):
+```
+S3_BUCKET=school-files
+S3_ACCESS_KEY_ID=<access key id>
+S3_SECRET_ACCESS_KEY=<secret access key>
+S3_REGION=auto
+S3_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+```
+5. Build and test the bucket **before** switching anything over:
+```bash
+pnpm --filter @school/api build
+pnpm --filter @school/api storage:check
+```
+   It saves a small file, reads it back, deletes it and confirms it is gone, and says which step failed if not (a 403 usually means
+   the token lacks write access to this bucket; a 404 usually means a wrong bucket name or endpoint).
+6. **If the school already has files on disk**, copy them across (the originals stay where they are):
+```bash
+pnpm --filter @school/api storage:migrate -- --dry-run     # only lists what would be copied
+pnpm --filter @school/api storage:migrate                  # copies and checks each file
+```
+   It is safe to run again. Files uploaded to the disk **after** the copy but before the restart would be missed, so run it once more
+   right before restarting.
+7. Restart the API. From then on every upload, download and delete goes to R2. Try one of each.
+8. Keep the old disk folder for a while, and keep taking the backups in `docs/DEPLOYMENT.md` section 9.
+
+**Checked against a real R2 bucket on 1 Oct 2026:** `storage:check` passed all four steps (save, read back, delete, confirm gone) with a
+real Cloudflare account. What has **not** been seen is the app itself uploading a homework file, a photo or a logo and downloading it
+again through the bucket, nor `storage:migrate` with real files (there were none to copy). `storage:check` is safe to repeat: it
+touches only its own test file.
+
+### Any S3-compatible bucket
+Set the bucket and keys and the app uses it instead of the disk:
 ```
 S3_BUCKET=school-files
 S3_ACCESS_KEY_ID=...
@@ -201,8 +267,10 @@ S3_PREFIX=                         # optional folder inside the bucket
 - Where to look: Cloudflare R2 -> Manage API tokens (Object Read and Write, limited to the one bucket); Amazon S3 -> an IAM user
   with a policy limited to the one bucket.
 - Keep the bucket **private**. The app hands files out itself after checking who is asking; nobody should get a public link.
-- Turn on **versioning** so a deleted or overwritten file can be recovered.
-- Files already on disk are **not moved** when you switch. Copy `UPLOAD_DIR` into the bucket (same key names) before switching.
+- **Recovering deleted files:** on Amazon S3 turn on **versioning**. Cloudflare R2 did not offer object versioning when this was
+  written (check its current documentation), so on R2 keep a second copy instead, for example a nightly `rclone sync` of the bucket to a
+  bucket at another provider or to a server you control (`docs/DEPLOYMENT.md` section 9).
+- Files already on disk are **not moved** when you switch. Copy them first with `pnpm --filter @school/api storage:migrate` (see above).
 - Built with its own request signing (no SDK). **Never tried against a real provider**; test upload, download and delete first.
 
 ## 4c. Optional: Virus scanning (ClamAV)
@@ -217,6 +285,82 @@ CLAMAV_TIMEOUT_MS=20000    # optional
 - When it is on, an infected file is refused, and **uploads are refused while the scanner is unreachable**. Keep the scanner running
   and give it enough memory (ClamAV needs roughly 1 to 2 GB).
 - Keep the virus signatures updated (the Docker image does this by itself).
+
+## 4d. Optional: Google Drive as extra storage
+
+Google Drive can hold files when the main storage (this server's disk or your bucket, section 4b) is full, or whenever a clerk,
+principal or admin chooses it. It works with **Google Workspace** schools and with schools that only have a normal Gmail account.
+
+**How the app uses it**
+- Every stored file is remembered with where it went (the main storage or Drive), so reading and deleting always find it. Files are
+  never moved automatically: only **new** files follow the current choice.
+- On the **Storage** page (workspace menu; clerk, principal and admin) a school chooses where **its** new files go:
+  - **Automatic (recommended):** the main storage first; Google Drive takes over when the main storage is full, which means either
+    it holds `STORAGE_PRIMARY_LIMIT_GB` gigabytes or it refuses a file.
+  - **Main storage only**, or **Google Drive only**.
+- The page also shows how much room each place uses, whose Google account is connected, and a **Run the test** button.
+- School logos always stay in the main storage (they are shown on the public sign-in page and must load fast).
+- Files in Drive are still private: the app checks who is asking before it hands a file over, exactly as for any other file. Nobody
+  gets a Drive link.
+
+**Set it up (service account, recommended)**
+1. Go to console.cloud.google.com and create a project (or pick one). **APIs and Services -> Library -> Google Drive API -> Enable.**
+2. **IAM and Admin -> Service Accounts -> Create service account** (any name, for example `school-files`). Open it, then
+   **Keys -> Add key -> Create new key -> JSON.** A key file downloads. Keep it secret.
+3. In Google Drive make a folder (for example `School files`) and **share it with the service account's email address**
+   (it looks like `school-files@your-project.iam.gserviceaccount.com`) as **Editor**. Copy the folder's id: it is the end of its
+   address, `drive.google.com/drive/folders/<THIS PART>`.
+   *Google Workspace schools:* for more room, make a **Shared drive**, add the service account as a **Content manager**, and use a
+   folder inside it.
+4. In the server's `.env` set (see `.env.example`):
+```
+GDRIVE_FOLDER_ID=<the folder id>
+GDRIVE_SERVICE_ACCOUNT_JSON='<the whole key file on one line>'
+STORAGE_PRIMARY_LIMIT_GB=10          # optional: Cloudflare R2's free allowance; empty = no limit
+```
+5. Restart the API, open **Storage** and press **Run the test**: it signs in, saves a small file in the folder, reads it back,
+   deletes it and says which step failed if one does.
+
+**How much room does it have?** A service account has only a small allowance of its own (historically about 15 GB; check Google's
+current documentation, it has changed before). For more, use a Workspace **Shared drive** (it uses the organisation's storage) or the
+personal sign-in below.
+
+**Or sign in as a person (uses that person's own storage space)**: set `GDRIVE_CLIENT_ID`, `GDRIVE_CLIENT_SECRET` and
+`GDRIVE_REFRESH_TOKEN` instead of the service account, with the same `GDRIVE_FOLDER_ID` (a folder in that person's Drive). To get the
+refresh token create an OAuth client in Google Cloud and authorise it for the Drive scope (the OAuth Playground can do this with your
+own client). **Warning:** while the Google Cloud OAuth consent screen is in "Testing" mode, Google expires the refresh token after about
+7 days, and Drive stops working until a new one is made. Publish the consent screen (or use the service account) to avoid this.
+
+**Limits and things to know**
+- Drive is slower than a bucket and has Google's own request and daily upload limits. It is meant as overflow, not as the main store.
+- If Drive is chosen and Google refuses a file, the upload fails with an error; it is not quietly sent somewhere else. Only in
+  **Automatic** mode does a failing main storage fall back to Drive.
+- Switching to Drive needs the Drive connection to be working; the Storage page will not let anyone choose it until it is connected.
+- Back up Drive-held files too: they are not in the bucket or the server's disk.
+- **Never tried against real Google.** The sign-in, the upload, read and delete calls and the switching rules are tested against a
+  stand-in server only. Run **Run the test** first, then try one real upload and download.
+
+## 4e. Adding files from a link (and the "?" button)
+
+Everyone who may upload files except **students** can also add a file by pasting a link: **school documents** (clerk, principal, admin),
+**class resources** (the class teacher), **books** (teacher, clerk, principal, admin) and **homework attachments** (the class
+teacher). A **From a link** button sits beside the normal upload button, and a round **?** button next to it opens the list of which
+links work and how to get one.
+
+- **Sources:** Google Drive files, Google Docs / Sheets / Slides (saved as a PDF), Dropbox, OneDrive and SharePoint, GitHub files, and any
+  direct link to a file. The "?" list comes from the server, so it always matches what really works.
+- **Private Google Drive files:** if the file cannot be opened publicly and Drive is connected (section 4d) the app opens it with its own
+  Drive account. Share the file with the service account's email (the "?" window shows the address) as **Viewer**.
+- **Same rules as an upload:** PDF, Word, text, PNG or JPG; up to 100 MB; the file's real content must match its type; virus scanning
+  applies if it is on; it is stored wherever new files go (section 4d); it is in the audit log like any upload.
+- **Safety:** the school's server fetches the address, so it refuses anything that points at a private or internal address (this
+  machine, the school network, cloud metadata addresses), checks every redirect, and gives up on files over the size limit or sites that
+  are too slow.
+- **Not supported:** links that need a sign-in (other than the Drive case above), web pages that are not a file, folders. There is **no
+  Google Drive file picker** inside the app (that would need a separate Google sign-in set up in the browser); Drive files are added by
+  pasting their share link. Students always upload from their own device.
+- **Never tried against the real sites.** The link rules and the download are tested against a small test server and the documented
+  address formats; Google, Dropbox and OneDrive can change theirs.
 
 ## 5. Used inside the app (no account needed)
 
@@ -349,13 +493,20 @@ Set these in the root `.env` (the API) unless the name starts with `VITE_` (the 
 | Setting | Needed? | What it does |
 |---|---|---|
 | `DATABASE_URL` | Required | PostgreSQL connection string |
-| `JWT_SECRET`, `JWT_REFRESH_SECRET` | Required | Sign login tokens (access tokens last 15 minutes, refresh tokens 7 days). **Not checked for strength: never leave the placeholders.** |
+| `JWT_SECRET`, `JWT_REFRESH_SECRET` | Required | Sign login tokens (access tokens last 15 minutes, refresh tokens 7 days). At least 32 random characters each and different from each other; checked at start-up when `NODE_ENV=production`. Changing one signs everyone out |
 | `PORT` | Optional | API port, default 4000 |
+| `NODE_ENV` | Set to `production` on a real server | In production the API **refuses to start** if a JWT secret is missing, under 32 characters, a placeholder or the same as the other; if the Super Admin password is a demo or under 12 characters; or if `WEB_ORIGIN` is localhost or not https. Elsewhere it only warns |
+| `TRUST_PROXY` | Set to `1` behind Nginx | Number of proxies in front of the API, so the sign-in limiter sees each visitor's real address. Leave empty if reached directly |
+| `LOGIN_MAX_PER_EMAIL`, `LOGIN_MAX_PER_IP`, `LOGIN_WINDOW_MINUTES` | Optional | Sign-in lockout: 10 wrong passwords per email and 60 per network address in 15 minutes, by default. Held in this server's memory, so it resets on restart and assumes one API process |
 | `WEB_ORIGIN` | Required | The web app's address(es), comma-separated. Used for CORS and live connections |
 | `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD` | Required for multi-school | Create the platform owner at first start |
 | `UPLOAD_DIR` | Optional | Folder for uploaded files when no bucket is set |
 | `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_REGION`, `S3_ENDPOINT`, `S3_FORCE_PATH_STYLE`, `S3_PREFIX` | Optional | Store files in a bucket (section 4b) |
 | `CLAMAV_HOST`, `CLAMAV_PORT`, `CLAMAV_TIMEOUT_MS` | Optional | Virus scanning (section 4c) |
+| `GDRIVE_FOLDER_ID` | Optional | The Drive folder for extra storage; empty keeps Google Drive off (section 4d) |
+| `GDRIVE_SERVICE_ACCOUNT_JSON` (or `GDRIVE_CLIENT_EMAIL` + `GDRIVE_PRIVATE_KEY`) | With Drive | The service account's key, on one line in single quotes. A secret |
+| `GDRIVE_CLIENT_ID`, `GDRIVE_CLIENT_SECRET`, `GDRIVE_REFRESH_TOKEN` | With Drive, instead | Sign in as a person instead of a service account. Secrets |
+| `STORAGE_PRIMARY_LIMIT_GB` | Optional | Gigabytes the main storage may hold before "Automatic" switches to Google Drive. Empty = no limit |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_FROM` | Optional | Email through SMTP (section 3) |
 | `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANG` | Optional | WhatsApp (section 4) |
 | `WHATSAPP_VERIFY_TOKEN` | Not used yet | Reserved for receiving WhatsApp replies |
@@ -367,3 +518,40 @@ Set these in the root `.env` (the API) unless the name starts with `VITE_` (the 
 | `VITE_API_URL` | Web build | The API's address as the browser sees it |
 | `VITE_BASE_DOMAIN` | Web build, optional | Per-school subdomains (section 11) |
 | `VITE_STUN_URLS`, `VITE_TURN_URL`, `VITE_TURN_USERNAME`, `VITE_TURN_CREDENTIAL` | Web build, optional | Voice connection helpers (section 10) |
+
+## School cameras (principal and admin only)
+
+The **School cameras** page shows live video. Browsers cannot play `rtsp://` streams, and most IP cameras only speak RTSP, so run
+a small gateway on the school network and point the site at what it produces:
+
+1. Install [go2rtc](https://github.com/AlexxIT/go2rtc) or [MediaMTX](https://github.com/bluenviron/mediamtx) on any always-on PC next to the cameras.
+2. Give it each camera's RTSP address (`rtsp://user:password@192.168.1.50:554/stream1`).
+3. In the site, open **School cameras → Add camera** and paste the gateway's address: an HLS playlist
+   (`http://gateway:8888/gate/index.m3u8` on MediaMTX) or an MJPEG stream (`http://gateway:1984/api/stream.mjpeg?src=gate` on go2rtc).
+
+The API server must be able to reach the gateway. The address is stored on the server and never sent to a browser; the browser
+only talks to the API, which checks the user is a principal or admin and relays the video. Opening a camera is written to the
+audit log. Cameras with no gateway but an HTTP MJPEG endpoint (many cheap cameras) work directly.
+
+## Connect Google Drive (sign-in on the Storage page)
+
+This is the easy way to link Drive: a clerk, principal or admin opens **Storage → Connect Google Drive**, signs in on Google's own
+page and chooses Allow. The school then shows the Drive's used and total space, and staff (teachers, clerk, principal, admin; never
+students or parents) can upload and view photos, videos and documents on the **Drive files** page.
+
+One-time setup by whoever runs the server (free):
+
+1. In [Google Cloud Console](https://console.cloud.google.com/) create a project and turn on the **Google Drive API**.
+2. **APIs & Services → OAuth consent screen**: fill in the app name and your email. While it is in "Testing", add each Google account that
+   will connect as a test user (or publish the app).
+3. **Credentials → Create credentials → OAuth client ID → Web application**. Under *Authorised redirect URIs* add
+   `<API_PUBLIC_URL>/api/storage/drive/callback` (for local use: `http://localhost:4000/api/storage/drive/callback`).
+4. Put the client ID and secret in `.env` as `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, set `API_PUBLIC_URL`, and restart the API.
+
+How it behaves:
+
+- The app asks only for the `drive.file` permission: it can see the folder and files it makes itself, **not** the rest of that Google account.
+- Each school links its own Google account. The lasting access token is stored encrypted (key derived from `JWT_SECRET`, so keep that stable).
+- A school's link is used first; the older server-wide settings (`GDRIVE_*`, section 4d) still work for schools that have no link.
+- Disconnecting keeps the files in Drive. Connecting the same Google account again makes them reachable again.
+- Never tried against real Google: only against a stand-in server in the tests.

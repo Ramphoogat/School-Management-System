@@ -1,5 +1,6 @@
 import { BadRequestException, Body, Controller, ForbiddenException, Get, Module, NotFoundException, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common'
-import { IsEmail, IsIn, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
+import { Type } from 'class-transformer'
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsEmail, IsIn, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator'
 import { randomBytes } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { SCHOOL_ROLES, roleCan, type Role } from '@school/permissions'
@@ -17,6 +18,15 @@ class CreateUserDto {
   @IsEmail() email: string
   @IsIn([...SCHOOL_ROLES]) role: Role
   @IsOptional() @IsString() @MaxLength(30) phone?: string
+}
+class ImportRowDto {
+  @IsString() @MinLength(2) @MaxLength(80) name: string
+  @IsString() @MaxLength(200) email: string
+  @IsIn([...SCHOOL_ROLES]) role: Role
+  @IsOptional() @IsString() @MaxLength(30) phone?: string
+}
+class ImportUsersDto {
+  @IsArray() @ArrayMinSize(1) @ArrayMaxSize(500) @ValidateNested({ each: true }) @Type(() => ImportRowDto) rows: ImportRowDto[]
 }
 class UpdateUserDto {
   @IsOptional() @IsString() @MinLength(2) @MaxLength(80) name?: string
@@ -101,6 +111,39 @@ export class UsersController {
     return { user: u, tempPassword: pw }
   }
 
+  /**
+   * Adds many people at once (up to 500). Rows with a bad email, a duplicate or a role the actor may not give are skipped and
+   * reported; the rest are created. The student limit of the plan is checked for the whole batch first.
+   */
+  @Post('import')
+  @RequirePermission('users', 'manage')
+  async import(@CurrentUser() actor: AuthUser, @Body() dto: ImportUsersDto) {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const existing = new Set((await this.prisma.user.findMany({ where: { schoolId: actor.schoolId }, select: { email: true } })).map((u) => u.email.toLowerCase()))
+    const skipped: { row: number; email: string; reason: string }[] = []
+    const todo: { row: number; name: string; email: string; role: Role; phone: string | null }[] = []
+    dto.rows.forEach((r, i) => {
+      const email = r.email.trim().toLowerCase()
+      const reason = !emailOk.test(email) ? 'Not a valid email address'
+        : existing.has(email) ? 'Someone already uses that email address'
+        : actor.role !== 'admin' && TOP.includes(r.role) ? 'Only an admin can give the admin or principal role'
+        : ''
+      if (reason) return void skipped.push({ row: i + 1, email, reason })
+      existing.add(email)
+      todo.push({ row: i + 1, name: r.name.trim(), email, role: r.role, phone: r.phone?.trim() || null })
+    })
+    const students = todo.filter((r) => r.role === 'student').length
+    if (students) await this.plans.assertStudentRoom(actor.schoolId, students)
+    const created: { name: string; email: string; role: Role; tempPassword: string }[] = []
+    for (const r of todo) {
+      const pw = tempPassword()
+      await this.prisma.user.create({ data: { schoolId: actor.schoolId, email: r.email, name: r.name, role: r.role, phone: r.phone, passwordHash: await bcrypt.hash(pw, 10), mustChangePassword: true } })
+      created.push({ name: r.name, email: r.email, role: r.role, tempPassword: pw })
+    }
+    await this.audit.log(this.prisma, { schoolId: actor.schoolId, actorId: actor.id, action: 'user.imported', resource: 'user', resourceId: actor.schoolId, meta: { created: created.length, skipped: skipped.length } })
+    return { created, skipped }
+  }
+
   @Patch(':id')
   @RequirePermission('users', 'manage')
   async update(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: UpdateUserDto) {
@@ -154,7 +197,7 @@ export class UsersController {
     const u = await this.target(actor, id)
     if (u.id === actor.id) throw new BadRequestException('You cannot deactivate yourself')
     await this.assertNotLastAdmin(actor, u)
-    await this.prisma.user.update({ where: { id }, data: { active: false } })
+    await this.prisma.user.update({ where: { id }, data: { active: false, tokenVersion: { increment: 1 } } })
     await this.audit.log(this.prisma, { schoolId: actor.schoolId, actorId: actor.id, action: 'user.deactivated', resource: 'user', resourceId: id })
     return { id, active: false }
   }
@@ -176,7 +219,7 @@ export class UsersController {
     const u = await this.target(actor, id)
     if (u.id === actor.id) throw new BadRequestException('Change your own password from Settings')
     const pw = tempPassword()
-    await this.prisma.user.update({ where: { id }, data: { passwordHash: await bcrypt.hash(pw, 10), mustChangePassword: true } })
+    await this.prisma.user.update({ where: { id }, data: { passwordHash: await bcrypt.hash(pw, 10), mustChangePassword: true, tokenVersion: { increment: 1 } } })
     await this.audit.log(this.prisma, { schoolId: actor.schoolId, actorId: actor.id, action: 'user.password_reset', resource: 'user', resourceId: id })
     return { id, name: u.name, email: u.email, tempPassword: pw }
   }

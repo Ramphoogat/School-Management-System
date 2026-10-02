@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { useAuth } from '@/lib/auth'
 import Shell from '@/components/Shell'
 import Login from '@/pages/Login'
+import { ForgotPassword, ResetPassword } from '@/pages/PasswordReset'
 import { MessagesProvider } from '@/lib/messages'
 import { useT } from '@/lib/i18n'
 
@@ -38,7 +39,13 @@ const Students = page(() => import('@/pages/Records'), 'Students')
 const Waivers = page(() => import('@/pages/Records'), 'Waivers')
 const Certificates = page(() => import('@/pages/Records'), 'Certificates')
 const Documents = lazy(() => import('@/pages/Documents'))
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'))
+const SecuritySettings = lazy(() => import('@/pages/SecuritySettings'))
+const McpPage = lazy(() => import('@/pages/Mcp'))
 const SchoolPlan = lazy(() => import('@/pages/SchoolPlan'))
+const DriveFiles = page(() => import('@/pages/DriveFiles'), 'DriveFiles')
+const Cameras = page(() => import('@/pages/Cameras'), 'Cameras')
+const StorageSettings = page(() => import('@/pages/Storage'), 'StorageSettings')
 const Academic = lazy(() => import('@/pages/Academic'))
 const IdCards = page(() => import('@/pages/IdCards'), 'IdCards')
 const CertificateView = page(() => import('@/pages/Records'), 'CertificateView')
@@ -70,6 +77,8 @@ export default function App() {
       <Suspense fallback={<p className="p-6 text-muted-foreground">{t('Loading…')}</p>}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route element={<Protected><MessagesProvider><Shell /></MessagesProvider></Protected>}>
             <Route path="/" element={<Landing />} />
             <Route path="/platform" element={<Protected resource="schools" action="manage"><Platform /></Protected>} />
@@ -92,7 +101,13 @@ export default function App() {
             <Route path="/waivers" element={<Protected resource="fees" action="approve"><Waivers /></Protected>} />
             <Route path="/certificates" element={<Protected resource="certificates" action="read"><Certificates /></Protected>} />
             <Route path="/documents" element={<Documents />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/mcp" element={<Protected resource="notifications" action="manage"><McpPage /></Protected>} />
+            <Route path="/security-settings" element={<SecuritySettings />} />
             <Route path="/school-plan" element={<Protected resource="billing" action="read"><SchoolPlan /></Protected>} />
+            <Route path="/drive" element={<Protected resource="drive" action="use"><DriveFiles /></Protected>} />
+            <Route path="/cameras" element={<Protected resource="cameras" action="view"><Cameras /></Protected>} />
+            <Route path="/storage" element={<Protected resource="storage" action="manage"><StorageSettings /></Protected>} />
             <Route path="/academic" element={<Protected resource="academic" action="manage"><Academic /></Protected>} />
             <Route path="/id-cards" element={<Protected resource="idcards" action="bulk_write"><IdCards /></Protected>} />
             <Route path="/certificates/:id" element={<Protected resource="certificates" action="read"><CertificateView /></Protected>} />

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import { SCHOOL_ROLES } from '@school/permissions'
 import { Eye, EyeOff } from 'lucide-react'
@@ -112,6 +112,7 @@ export default function Login() {
             <Button type="submit" className="w-full" disabled={busy}>
               {busy ? t('Signing in…') : t('Sign in')}
             </Button>
+            <p className="text-center text-sm"><Link to="/forgot-password" className="text-muted-foreground underline underline-offset-4 hover:text-foreground">{t('Forgot your password?')}</Link></p>
           </form>
         </CardContent>
       </Card>

@@ -432,7 +432,7 @@ export class MessagesController {
     const c = await this.mine(user, id)
     const { ok } = await this.svc.canConverseWith(user, this.otherId(c, user.id))
     if (!ok) throw new ForbiddenException('You can no longer message this person')
-    if (!file) throw new BadRequestException('Choose a file (max 10 MB)')
+    if (!file) throw new BadRequestException('Choose a file (max 100 MB)')
     const type = judgeUpload(file)
     if (!type) throw new BadRequestException(`Allowed files: ${ALLOWED_FILES_TEXT}`)
 
@@ -442,7 +442,7 @@ export class MessagesController {
     if ((await this.prisma.dmAttachment.count({ where: { conversationId: id, uploaderId: user.id, messageId: null } })) >= MAX_ATTACHMENTS) throw new BadRequestException(`At most ${MAX_ATTACHMENTS} files per message`)
 
     const storageKey = newKey()
-    await putFile(storageKey, file.buffer)
+    await putFile(storageKey, file.buffer, { schoolId: user.schoolId })
     try {
       const row = await this.prisma.dmAttachment.create({ data: { schoolId: user.schoolId, conversationId: id, uploaderId: user.id, name: cleanName(file.originalname), mime: type.mime, size: file.size, storageKey } })
       return { id: row.id, name: row.name, size: row.size, mime: row.mime }

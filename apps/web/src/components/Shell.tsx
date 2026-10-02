@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router'
-import { ChevronLeft, ChevronRight, Home, LogOut, Menu, Palette, Plus, Search, Trash2, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Home, LogOut, Palette, Plus, Trash2 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useT } from '@/lib/i18n'
 import { useAuth } from '@/lib/auth'
-import { logoSrc } from '@/lib/tenant'
+import { TopBar } from '@/components/TopBar'
 import { AppearanceDialog } from '@/components/AppearanceDialog'
 import { CreateChannelDialog } from '@/components/CreateChannelDialog'
 import { channelIcon } from '@/lib/channelIcons'
 import { toast } from 'sonner'
 import { CommandBar } from '@/components/CommandBar'
-import { navItems } from '@/lib/nav'
+import { navItems, NAV_GROUPS } from '@/lib/nav'
 import { useMessages } from '@/lib/messages'
 import { Button } from '@/components/ui/button'
 import { usePresence } from '@/lib/presence'
@@ -64,7 +64,6 @@ export default function Shell() {
   const { user, logout, can } = useAuth()
   const { t } = useT()
   const [classes, setClasses] = useState<ClassInfo[]>([])
-  const [open, setOpen] = useState(false)
   const [cmd, setCmd] = useState(false)
   const [addingTo, setAddingTo] = useState<{ id: string; name: string } | null>(null)
   const { myStatus, setMyStatus } = usePresence()
@@ -76,7 +75,9 @@ export default function Shell() {
   }, [])
   // On tablets and phones the class rail (the strip with the Home button) can be shown or hidden with a small round button.
   // It starts open on a tablet and closed on a phone. On a wide screen it is always shown and the button is not.
-  const [railOpen, setRailOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768)
+  // Below the desktop width the narrow rail (Home and the classes) is always there, and the workspace list extends out beside it
+  // when the round button is pressed. On wide screens both are always shown and this value is not used.
+  const [railOpen, setRailOpen] = useState(false)
   const [planNote, setPlanNote] = useState<'expiring' | 'grace' | 'overdue' | null>(null)
   const seesBilling = can('billing', 'read')
   useEffect(() => {
@@ -106,14 +107,15 @@ export default function Shell() {
     return () => window.removeEventListener('classes-changed', load)
   }, [user?.id])
 
-  // Close the mobile drawer after navigating, and on Escape.
-  useEffect(() => setOpen(false), [loc.pathname, loc.search])
+  // On a phone the workspace list covers part of the page, so it closes after going to a page. On a tablet it stays open.
+  // Escape closes it on either.
+  useEffect(() => { if (window.innerWidth < 768) setRailOpen(false) }, [loc.pathname, loc.search])
   useEffect(() => {
-    if (!open) return
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    if (!railOpen) return
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') setRailOpen(false) }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [open])
+  }, [railOpen])
 
   // Every page has its own title (WCAG 2.4.2), which is also what a screen reader announces after a page change.
   useEffect(() => {
@@ -127,6 +129,12 @@ export default function Shell() {
   // Channel list is built from permissions, so users never see things they cannot use.
   const { unread } = useMessages()
   const workspace = navItems(can, user?.role)
+  const sections = NAV_GROUPS.map((g) => ({ ...g, items: workspace.filter((w) => w.group === g.id) })).filter((g) => g.items.length > 0)
+  // A section is open while you are on one of its pages; you can open or close the others yourself.
+  const activeGroup = workspace.filter((w) => loc.pathname === w.to || loc.pathname.startsWith(w.to + '/')).sort((a, b) => b.to.length - a.to.length)[0]?.group
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set())
+  useEffect(() => { if (activeGroup) setOpenGroups((o) => (o.has(activeGroup) ? o : new Set(o).add(activeGroup))) }, [activeGroup])
+  const toggleGroup = (id: string) => setOpenGroups((o) => { const n = new Set(o); if (n.has(id)) n.delete(id); else n.add(id); return n })
   // Class managers and teachers can add channels; the API enforces the same rule.
   const channelActive = (classId: string, ch: { id: string; type: string }) => {
     if (loc.pathname !== `/classes/${classId}`) return false
@@ -152,22 +160,39 @@ export default function Shell() {
 
   const sidebar = (
     <div className="flex h-full min-w-0 flex-1 flex-col bg-card">
-      <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4 font-semibold shadow-sm">
-        {logoSrc(user?.school) && <img src={logoSrc(user?.school)!} alt="" className="h-8 w-8 shrink-0 rounded object-contain" />}
-        <span className="truncate">{user?.school?.name ?? t('School Platform')}</span>
-      </div>
       <nav aria-label={t('Workspace')} className="flex-1 overflow-y-auto px-2 py-3">
         <p className="mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t('Workspace')}</p>
         <NavLink to="/" end className={linkClass}>
           <Home className="h-4 w-4" /> {t('Home')}
         </NavLink>
-        {workspace.map((w) => (
-          <NavLink key={w.to} to={w.to} className={linkClass}>
-            <w.icon className="h-4 w-4" />
-            <span className="truncate">{t(w.label)}</span>
-            {w.to === '/messages' && unread > 0 && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground">{unread > 99 ? '99+' : unread}</span>}
-          </NavLink>
-        ))}
+        {sections.map((g) => {
+          const open = openGroups.has(g.id)
+          const hasUnread = g.id === 'messaging' && unread > 0
+          return (
+            <div key={g.id} className="mt-1">
+              <button
+                type="button" aria-expanded={open} aria-controls={`nav-${g.id}`} onClick={() => toggleGroup(g.id)}
+                className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent/60 focus-visible:outline-2 focus-visible:outline-ring"
+              >
+                <g.icon className="h-4 w-4" aria-hidden />
+                <span className="truncate">{t(g.label)}</span>
+                {hasUnread && !open && <span className="flex h-2 w-2 rounded-full bg-primary" aria-label={t('Unread messages')} />}
+                <ChevronDown className={`ml-auto h-4 w-4 text-muted-foreground transition-transform ${open ? '' : '-rotate-90'}`} aria-hidden />
+              </button>
+              {open && (
+                <div id={`nav-${g.id}`} className="ml-4 mt-0.5 space-y-0.5 border-l pl-2">
+                  {g.items.map((w) => (
+                    <NavLink key={w.to} to={w.to} className={linkClass}>
+                      <w.icon className="h-4 w-4" />
+                      <span className="truncate">{t(w.label)}</span>
+                      {w.to === '/messages' && unread > 0 && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground">{unread > 99 ? '99+' : unread}</span>}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
         {classes.map((c) => (
           <div key={c.id} className="mt-5">
             <div className="mb-1 flex items-center pr-1">
@@ -190,7 +215,7 @@ export default function Shell() {
                 </button>
               )}
             </div>
-            {(loc.pathname === `/classes/${c.id}` || loc.pathname.startsWith(`/classes/${c.id}/`) ? c.channels : []).filter((ch) => ch.type !== 'voice' || can('voice', 'join')).map((ch) => (
+            {(loc.pathname === `/classes/${c.id}` || loc.pathname.startsWith(`/classes/${c.id}/`) ? c.channels : []).filter((ch) => (ch.type !== 'voice' || can('voice', 'join')) && (ch.type !== 'books' || user?.role !== 'parent')).map((ch) => (
               <div key={ch.id} className="group flex items-center">
                 <Link
                   to={ch.type === 'text' ? `/classes/${c.id}?channel=text&cid=${ch.id}` : `/classes/${c.id}?channel=${ch.type}`}
@@ -262,52 +287,38 @@ export default function Shell() {
         {t('Skip to main content')}
       </a>
       <div className="wallpaper-layer" aria-hidden />
-      {/* Mobile top bar */}
-      <header className="flex h-14 shrink-0 items-center gap-2 border-b px-3 md:hidden">
-        <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t('Open menu')} aria-expanded={open}>
-          <Menu className="h-5 w-5" />
-        </Button>
-        <span className="truncate font-semibold">{user?.school?.name ?? t('School Platform')}</span>
-      </header>
-
+      <TopBar onSearch={() => setCmd(true)} />
       <div className="relative flex min-h-0 flex-1">
-      {/* Wide screens: rail + sidebar, always. Tablet and phone: the rail only, shown or hidden by the round button. */}
-      <aside aria-label={t('Main menu')} className={`shrink-0 border-r lg:flex lg:w-[312px] ${railOpen ? 'flex w-[72px]' : 'hidden'}`}>
+      {/* The rail (Home and the classes) is always shown. The workspace list sits right beside it: always on wide screens; on a
+          tablet it opens beside the rail and pushes the page over; on a phone it opens over the page, which dims (tap it to close).
+          The round button on the edge opens and closes it. */}
+      {railOpen && <div className="absolute inset-y-0 left-[72px] right-0 z-30 bg-black/50 md:hidden" onClick={() => setRailOpen(false)} aria-hidden />}
+      <aside aria-label={t('Main menu')} className="relative z-40 flex shrink-0 border-r bg-background">
         {rail}
-        <div className="hidden min-w-0 flex-1 border-l lg:flex">{sidebar}</div>
+        <div
+          id="workspace-menu"
+          onClick={(e) => { if (window.innerWidth < 768 && (e.target as HTMLElement).closest('a')) setRailOpen(false) }} // on a phone, close as soon as a page is chosen
+          className={`absolute inset-y-0 left-[72px] z-40 w-[min(240px,calc(100vw-112px))] border-l border-r bg-background shadow-2xl md:static md:w-[240px] md:border-r-0 md:shadow-none lg:flex ${railOpen ? 'flex' : 'hidden'}`}
+        >
+          {sidebar}
+        </div>
       </aside>
       <button
         type="button"
         onClick={() => setRailOpen((o) => !o)}
         aria-expanded={railOpen}
-        aria-label={railOpen ? t('Hide the class list') : t('Show the class list')}
-        title={railOpen ? t('Hide the class list') : t('Show the class list')}
-        style={{ left: railOpen ? 72 : 14 }}
-        className="absolute top-3 z-30 flex size-6 -translate-x-1/2 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-md transition-[left] hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring lg:hidden"
+        aria-controls="workspace-menu"
+        aria-label={railOpen ? t('Hide the workspace menu') : t('Show the workspace menu')}
+        title={railOpen ? t('Hide the workspace menu') : t('Show the workspace menu')}
+        style={{ left: railOpen ? 'calc(72px + min(240px, calc(100vw - 112px)))' : 72 }}
+        // A slim tab fixed to the edge of the menu, halfway down it, like a drawer handle. The empty space around it is part of the tap area.
+        className="group absolute top-1/2 z-50 flex h-16 w-6 -translate-y-1/2 items-center justify-center rounded-r-2xl border border-l-0 bg-card text-muted-foreground shadow-lg transition-[left,color,background-color,box-shadow] duration-200 before:absolute before:-inset-x-1 before:-inset-y-2 before:content-[''] hover:bg-accent hover:text-foreground hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:bg-accent lg:hidden"
       >
-        {railOpen ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
+        <ChevronRight className={`size-4 transition-transform duration-200 group-hover:scale-110 ${railOpen ? 'rotate-180' : ''}`} aria-hidden />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} aria-hidden />
-          <div role="dialog" aria-modal="true" aria-label={t('Main menu')} className="absolute inset-y-0 left-0 flex w-[min(86vw,340px)] shadow-2xl">
-            {rail}
-            {sidebar}
-            <Button variant="ghost" size="icon" className="absolute right-1 top-2" onClick={() => setOpen(false)} aria-label={t('Close menu')} autoFocus>
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <main id="main" tabIndex={-1} className={`min-w-0 flex-1 overflow-y-auto p-4 focus:outline-none sm:p-6 lg:p-8 ${railOpen ? '' : 'max-lg:pl-9'}`}>
+      <main id="main" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto p-4 focus:outline-none max-lg:pl-8 sm:p-6 sm:max-lg:pl-8 lg:p-8">
         <div className="mx-auto w-full max-w-6xl">
-          <div className="mb-4 flex justify-end">
-            <Button variant="outline" size="sm" className="gap-2 text-muted-foreground" onClick={() => setCmd(true)}>
-              <Search className="h-4 w-4" /> {t('Search or jump to…')} <kbd className="rounded border px-1.5 text-xs">Ctrl K</kbd>
-            </Button>
-          </div>
           {!online && <div role="alert" className="mb-4 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm">{t('You are offline. Changes will not save until you are back online.')}</div>}
           {planNote && (
             <div role="status" className={`mb-4 rounded-md border p-3 text-sm ${planNote === 'overdue' ? 'border-destructive/50 bg-destructive/10' : 'border-amber-500/50 bg-amber-500/10'}`}>
@@ -319,7 +330,7 @@ export default function Shell() {
               {t('You are using a temporary password.')} <Link to="/settings" className="font-medium underline">{t('Change it now')}</Link>.
             </div>
           )}
-          <Outlet />
+          <Suspense fallback={<p className="py-8 text-center text-muted-foreground">{t('Loading…')}</p>}><Outlet /></Suspense>
           <CommandBar open={cmd} onOpenChange={setCmd} />
           <AppearanceDialog open={look} onOpenChange={setLook} />
         </div>

@@ -111,6 +111,9 @@ model User {
   passwordHash String
   phone        String?
   mustChangePassword Boolean @default(false)
+  /// Raised to sign the person out of every device at once. Tokens carry the number they were made with.
+  tokenVersion Int @default(0)
+  passwordResets PasswordReset[]
   role         Role
   active       Boolean  @default(true)
   createdAt    DateTime @default(now())
@@ -132,6 +135,10 @@ model Class {
   classTeacherId String?
   /// The student the class teacher picked as class monitor. Always also a student member.
   monitorId      String?
+  /// Set when the principal or admin deletes the class. Nothing is erased: the class is hidden everywhere and can be restored
+  /// (clearing this). Its name stays reserved while it is deleted.
+  deletedAt   DateTime?
+  deletedById String?
 
   school   School        @relation(fields: [schoolId], references: [id])
   members  ClassMember[]
@@ -788,4 +795,142 @@ model ConversationRead {
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@unique([conversationId, userId])
+}
+
+/// A one-time link that lets someone who forgot their password choose a new one. Only a hash of the link's secret is kept.
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// A book (a PDF, Word file or similar) that staff add to a class's books channel for its students to read.
+model Book {
+  id          String   @id @default(cuid())
+  schoolId    String
+  classId     String
+  title       String
+  author      String?
+  description String?
+  /// The uploaded file's own name, and what we decided it is (never what the browser claimed).
+  name        String
+  mime        String
+  size        Int
+  storageKey  String   @unique
+  addedById   String
+  createdAt   DateTime @default(now())
+
+  revocations BookRevocation[]
+
+  @@index([classId, createdAt])
+}
+
+/// A student whose use of one book has been withdrawn by the principal or admin. Removing the row gives it back.
+model BookRevocation {
+  id          String   @id @default(cuid())
+  schoolId    String
+  bookId      String
+  studentId   String
+  revokedById String
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, studentId])
+  @@index([studentId])
+}
+
+/// Where each stored file really is. Files are stored under a random key; this says whether that is the main storage (this
+/// server's disk or the bucket) or Google Drive, how big it is, and its Google Drive file id. A file with no row here is in
+/// the main storage (everything stored before this table existed).
+model StorageObject {
+  key       String   @id
+  /// "primary" (disk or bucket) or "drive"
+  backend   String
+  /// The Google Drive file id, when backend is "drive"
+  remoteId  String?
+  size      Int
+  schoolId  String?
+  createdAt DateTime @default(now())
+
+  @@index([backend])
+  @@index([schoolId, backend])
+}
+
+/// How a school's new files are stored: automatic (main storage until it is full, then Google Drive), always the main storage,
+/// or always Google Drive. The clerk, principal and admin change it.
+model StorageSetting {
+  schoolId    String   @id
+  mode        String   @default("auto")
+  updatedById String?
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+/// A school camera. Only the principal and admin can see or manage these. The stream address (which may carry the camera's
+/// password) stays on the server: browsers only ever talk to the API, which checks who is asking and relays the video.
+model Camera {
+  id          String   @id @default(cuid())
+  schoolId    String
+  name        String
+  /// Where it points, for example "Main gate" or "Corridor, 2nd floor".
+  location    String   @default("")
+  /// "hls" (an .m3u8 playlist) or "mjpeg" (a motion-JPEG stream).
+  kind        String
+  sourceUrl   String
+  enabled     Boolean  @default(true)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@index([schoolId])
+}
+
+/// A school's own Google Drive, linked by signing in with Google on the Storage page. The refresh token is stored encrypted.
+model DriveConnection {
+  schoolId       String   @id
+  email          String?
+  refreshToken   String
+  /// The folder the app made in that Drive; everything the school puts there lives inside it.
+  folderId       String
+  connectedById  String
+  createdAt      DateTime @default(now())
+}
+
+/// A file staff put in the school's Google Drive from the Drive files page (photos, videos, documents).
+model DriveFile {
+  id           String   @id @default(cuid())
+  schoolId     String
+  uploadedById String
+  name         String
+  mime         String
+  size         Int
+  driveId      String
+  createdAt    DateTime @default(now())
+
+  @@index([schoolId, createdAt])
+}
+
+/// A connection that lets an outside application (an AI assistant, for example) read the school's data through MCP, acting as
+/// the person who made it and never with more access than they have. Only a hash of the secret is kept.
+model McpToken {
+  id         String    @id @default(cuid())
+  schoolId   String
+  userId     String
+  name       String
+  tokenHash  String    @unique
+  /// The first characters of the secret, so a connection can be recognised in the list.
+  prefix     String
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([schoolId, userId])
 }

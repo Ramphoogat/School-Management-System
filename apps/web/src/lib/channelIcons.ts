@@ -1,6 +1,6 @@
 import {
   Award, BookOpen, Bell, Bus, Calculator, Calendar, Camera, ClipboardCheck, Coffee, Dumbbell, FlaskConical, FolderOpen, Gamepad2,
-  Globe, GraduationCap, Hash, Heart, Laptop, Lightbulb, Megaphone, MessageSquare, Microscope, Music, Palette, Pencil, Rocket,
+  Globe, GraduationCap, Hash, Heart, Laptop, Library, Lightbulb, Megaphone, MessageSquare, Microscope, Music, Palette, Pencil, Rocket,
   Smile, Star, Trophy, Users, Utensils, Volume2, type LucideIcon,
 } from 'lucide-react'
 
@@ -11,6 +11,7 @@ export const CHANNEL_ICONS: Record<string, LucideIcon> = {
   homework: BookOpen,
   chat: MessageSquare,
   resources: FolderOpen,
+  books: Library,
   grades: Award,
   voice: Volume2,
   text: Hash,

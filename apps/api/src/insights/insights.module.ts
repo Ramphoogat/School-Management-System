@@ -118,7 +118,7 @@ export class InsightsController {
 
     const [roles, classes, att, marks, invoices, students] = await Promise.all([
       this.prisma.user.groupBy({ by: ['role'], where: { schoolId: s, active: true }, _count: true }),
-      this.prisma.class.count({ where: { schoolId: s } }),
+      this.prisma.class.count({ where: { schoolId: s, deletedAt: null } }),
       this.prisma.attendance.findMany({ where: { schoolId: s, date: { gte: daysAgo(29) } }, select: { date: true, status: true, studentId: true, classId: true } }),
       this.prisma.mark.findMany({ where: { exam: { schoolId: s, status: 'approved' }, absent: false, score: { not: null } }, select: { score: true, exam: { select: { subject: true, maxMarks: true, classId: true } } } }),
       this.prisma.invoice.findMany({ where: { schoolId: s }, select: { amount: true, status: true, dueDate: true } }),

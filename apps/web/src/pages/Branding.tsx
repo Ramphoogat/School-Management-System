@@ -53,7 +53,7 @@ export function Branding() {
   const pickLogo = async (f?: File) => {
     if (!f) return
     if (!/\.(png|jpe?g)$/i.test(f.name)) return toast.error(t('The logo must be a PNG or JPG picture'))
-    if (f.size > 500 * 1024) return toast.error(t('The logo must be under 500 KB'))
+    if (f.size > 5 * 1024 * 1024) return toast.error(t('The logo must be under 5 MB'))
     setBusy(true)
     try { apply(await uploadFile<School>('/school/logo', f, undefined, true, 'PUT')); toast.success(t('Logo updated')); await reload() }
     catch (e) { toast.error((e as Error).message) } finally { setBusy(false) }
@@ -88,7 +88,7 @@ export function Branding() {
             {logo ? <img src={logo} alt={t('School logo')} className="h-full w-full object-contain" /> : <ImagePlus className="h-6 w-6 text-muted-foreground" />}
           </span>
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">{t('PNG or JPG, up to 500 KB. A square picture on a plain background works best.')}</p>
+            <p className="text-xs text-muted-foreground">{t('PNG or JPG, up to 5 MB. A square picture on a plain background works best.')}</p>
             <div className="flex gap-2">
               <input ref={file} type="file" hidden accept=".png,.jpg,.jpeg" onChange={(e) => { void pickLogo(e.target.files?.[0]); e.target.value = '' }} />
               <Button variant="outline" size="sm" disabled={busy} onClick={() => file.current?.click()}>{logo ? 'Change logo' : 'Upload logo'}</Button>

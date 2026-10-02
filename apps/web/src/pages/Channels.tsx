@@ -4,7 +4,7 @@ import { useParams, useSearchParams } from 'react-router'
 import { Users } from 'lucide-react'
 import { channelIcon } from '@/lib/channelIcons'
 import { toast } from 'sonner'
-import { api, tokens } from '@/lib/api'
+import { api, socketAuth } from '@/lib/api'
 import { useT } from '@/lib/i18n'
 import { downloadCsv } from '@/lib/csv'
 import { useAuth } from '@/lib/auth'
@@ -16,7 +16,8 @@ import { Grades } from '@/pages/Exams'
 import { Voice } from '@/pages/Voice'
 import { ChannelPicker, type Channel } from '@/components/ChannelPicker'
 import { Resources } from '@/components/Resources'
-import { AttachButton, FileChips } from '@/components/HomeworkFiles'
+import { Books } from '@/components/Books'
+import { Homework } from '@/components/Homework'
 import { BulkSelectionBar } from '@/components/BulkSelectionBar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -246,127 +247,6 @@ function AttendanceRoster({ classId }: { classId: string }) {
   )
 }
 
-function Homework({ classId }: { classId: string }) {
-  const { t } = useT()
-  const { user, can } = useAuth()
-  const canAssign = can('homework', 'write')
-  const isStudent = user?.role === 'student'
-  const [rows, setRows] = useState<any[]>([])
-  const [classes, setClasses] = useState<{ id: string; name: string }[]>([])
-  const [targets, setTargets] = useState<Set<string>>(new Set([classId]))
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [dueDate, setDueDate] = useState(todayStr())
-  const [channels, setChannels] = useState<Channel[]>(['email', 'in_app'])
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [open, setOpen] = useState<string | null>(null)
-  const [subs, setSubs] = useState<any[]>([])
-
-  const load = useCallback(() => api<any[]>(`/homework?classId=${classId}`).then(setRows), [classId])
-  useEffect(() => { load().catch((e) => toast.error(e.message)) }, [load])
-  useEffect(() => {
-    if (canAssign) api<{ id: string; name: string }[]>('/classes').then(setClasses)
-  }, [canAssign])
-
-  const assign = async (e: FormEvent) => {
-    e.preventDefault()
-    try {
-      const r = await api<{ results: { ok: boolean }[] }>('/homework', { body: { classIds: [...targets], title, description, dueDate, channels } })
-      const ok = r.results.filter((x) => x.ok).length
-      toast[ok === r.results.length ? 'success' : 'warning'](`Assigned to ${ok} of ${r.results.length} class(es)`)
-      setTitle(''); setDescription('')
-      await load()
-    } catch (err) { toast.error((err as Error).message) }
-  }
-
-  const submit = async (id: string) => {
-    try {
-      await api(`/homework/${id}/submit`, { body: { text: answers[id] } })
-      toast.success(t('Submitted'))
-      await load()
-    } catch (err) { toast.error((err as Error).message) }
-  }
-
-  const review = async (id: string) => {
-    if (open === id) return setOpen(null)
-    setSubs(await api<any[]>(`/homework/${id}/submissions`))
-    setOpen(id)
-  }
-
-  const toggleTarget = (id: string) => setTargets((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n })
-
-  return (
-    <div className="space-y-6">
-      {canAssign && (
-        <form onSubmit={assign} className="max-w-xl space-y-3">
-          <Input placeholder={t('Title')} value={title} onChange={(e) => setTitle(e.target.value)} required />
-          <Textarea placeholder={t('Instructions')} value={description} onChange={(e) => setDescription(e.target.value)} />
-          <Input type="date" aria-label={t('Due date')} value={dueDate} min={todayStr()} onChange={(e) => setDueDate(e.target.value)} className="w-44" required />
-          {classes.length > 1 && (
-            <fieldset className="space-y-1">
-              <legend className="text-sm font-medium">{t('Assign to classes')}</legend>
-              <div className="flex flex-wrap gap-4">
-                {classes.map((c) => (
-                  <label key={c.id} className="flex items-center gap-2 text-sm">
-                    <Checkbox checked={targets.has(c.id)} onCheckedChange={() => toggleTarget(c.id)} /> {c.name}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          )}
-          <ChannelPicker value={channels} onChange={setChannels} />
-          <Button type="submit" disabled={targets.size === 0}>{t('Assign homework')}</Button>
-        </form>
-      )}
-      {rows.length === 0 ? (
-        <p className="rounded-md border border-dashed p-8 text-center text-muted-foreground">
-          {t('No homework yet.')}{canAssign ? ' Assign the first one above.' : ' New assignments appear here.'}
-        </p>
-      ) : (
-        rows.map((a) => (
-          <article key={a.id} className="max-w-xl space-y-2 rounded-lg border p-4">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="font-medium">{a.title}</h3>
-              <Badge variant={a.dueDate < todayStr() ? 'destructive' : 'secondary'}>{t('Due {dueDate}', { dueDate: a.dueDate })}</Badge>
-            </div>
-            {a.description && <p className="whitespace-pre-wrap text-sm">{a.description}</p>}
-            <FileChips files={a.files ?? []} canRemove={a.canReview} onChanged={load} />
-            {a.canReview && canAssign && <AttachButton assignmentId={a.id} label="Attach file" onDone={load} />}
-            {isStudent && (
-              <div className="space-y-2">
-                {a.mySubmission && <Badge>{t('Submitted {value}', { value: new Date(a.mySubmission.submittedAt).toLocaleDateString() })}</Badge>}
-                <FileChips files={a.myFiles ?? []} canRemove onChanged={load} />
-                <AttachButton assignmentId={a.id} label="Upload your work" onDone={load} />
-                <Textarea placeholder={t('Your answer')} defaultValue={a.mySubmission?.text ?? ''} onChange={(e) => setAnswers((x) => ({ ...x, [a.id]: e.target.value }))} />
-                <Button size="sm" disabled={!answers[a.id]?.trim()} onClick={() => submit(a.id)}>{a.mySubmission ? 'Resubmit' : 'Submit'}</Button>
-              </div>
-            )}
-            {a.canReview && (
-              <div>
-                <Button size="sm" variant="outline" onClick={() => review(a.id)}>{a.submittedCount} submitted · {open === a.id ? 'Hide' : 'View'}</Button>
-                {open === a.id && (
-                  <Table className="mt-2">
-                    <TableHeader><TableRow><TableHead>{t('Student')}</TableHead><TableHead>{t('Status')}</TableHead><TableHead>{t('Files')}</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      {subs.map((s) => (
-                        <TableRow key={s.studentId}>
-                          <TableCell>{s.name}</TableCell>
-                          <TableCell>{s.submittedAt ? <span title={s.text}>{t('Submitted')}</span> : <span className="text-muted-foreground">{t('Missing')}</span>}</TableCell>
-                          <TableCell><FileChips files={s.files ?? []} /></TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </div>
-            )}
-          </article>
-        ))
-      )}
-    </div>
-  )
-}
-
 function Chat({ classId, channelId, members }: { classId: string; channelId?: string; members: Member[] | null }) {
   const { t } = useT()
   const { user } = useAuth()
@@ -374,15 +254,27 @@ function Chat({ classId, channelId, members }: { classId: string; channelId?: st
   const [msgs, setMsgs] = useState<any[]>([])
   const [text, setText] = useState('')
   const [live, setLive] = useState(false)
+  /** Why the chat is not working, in words, instead of an endless "Connecting…". */
+  const [problem, setProblem] = useState('')
   const sock = useRef<Socket | null>(null)
   const bottom = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let cancelled = false
+    setLive(false); setProblem('')
     api<any[]>(`/chat/${classId}${channelId ? `?channelId=${channelId}` : ''}`).then((h) => { if (!cancelled) setMsgs(h) }).catch((e) => toast.error(e.message))
-    const s = io(import.meta.env.VITE_API_URL ?? 'http://localhost:4000', { auth: { token: tokens.access } })
+    // A fresh sign-in token is fetched on every connection attempt: the stored one lasts only 15 minutes.
+    const s = io(import.meta.env.VITE_API_URL ?? 'http://localhost:4000', { auth: socketAuth() })
     sock.current = s
-    s.on('connect', () => { setLive(true); s.emit('join', { classId }) }) // re-join after reconnects
+    // Connected only counts once the server has accepted us into this class's room (and again after every reconnect).
+    s.on('connect', () => {
+      s.emit('join', { classId }, (r?: { ok: boolean }) => {
+        if (cancelled) return
+        if (r?.ok) { setLive(true); setProblem('') } else { setLive(false); setProblem(t('Your role cannot use the chat in this class.')) }
+      })
+    })
+    s.on('connect_error', () => { if (!cancelled) setProblem(t('Could not reach the chat server. Check your connection, then try again.')) })
+    s.on('error_message', () => { if (!cancelled) setProblem(t('Your sign-in has expired. Sign out and sign in again.')) })
     s.on('disconnect', () => setLive(false))
     s.on('message', (m) => { if (m.classId === classId && (m.channelId ?? null) === (channelId ?? null)) setMsgs((x) => (x.some((y) => y.id === m.id) ? x : [...x, m])) })
     return () => { cancelled = true; s.emit('leave', { classId }); s.close() }
@@ -400,7 +292,13 @@ function Chat({ classId, channelId, members }: { classId: string; channelId?: st
 
   return (
     <div className="flex h-[calc(100dvh-13rem)] min-h-96 w-full flex-col rounded-xl border bg-card">
-      <div className="border-b px-4 py-2 text-xs text-muted-foreground">{live ? 'Connected' : 'Connecting…'}{members && ` · ${members.filter((m) => isOnline(m.id)).length} of ${members.length} members online`}</div>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2 text-xs text-muted-foreground">
+        <span>
+          {problem ? <span role="alert" className="font-medium text-destructive">{problem}</span> : live ? t('Connected') : t('Connecting…')}
+          {members && ` · ${members.filter((m) => isOnline(m.id)).length} of ${members.length} members online`}
+        </span>
+        {problem && <Button type="button" size="sm" variant="outline" className="h-7" onClick={() => { setProblem(''); sock.current?.disconnect().connect() }}>{t('Try again')}</Button>}
+      </div>
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {msgs.length === 0 && <p className="text-center text-sm text-muted-foreground">{t('No messages yet. Say hello to your class.')}</p>}
         {msgs.map((m) => {
@@ -477,6 +375,8 @@ export function ClassPage() {
         <Homework key={id} classId={id} />
       ) : channel === 'resources' ? (
         <Resources key={id} classId={id} />
+      ) : channel === 'books' ? (
+        <Books key={id} classId={id} />
       ) : channel === 'attendance' ? (
         <Attendance key={id} classId={id} />
       ) : (

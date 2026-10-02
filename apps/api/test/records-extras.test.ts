@@ -244,7 +244,7 @@ describe('ID card photos', () => {
     for (const who of ['student', 'parent', 'teacher', 'principal'] as const) expect((await putPhoto(c[who], w.u.student2, PNG)).status, who).toBe(403)
     expect((await putPhoto(c.clerk, w.u.student2, Buffer.from('MZ not a picture'), 'p.jpg')).status).toBe(400)
     expect((await putPhoto(c.clerk, w.u.student2, PNG, 'p.gif')).status).toBe(400)
-    expect((await putPhoto(c.clerk, w.u.student2, Buffer.concat([PNG, Buffer.alloc(1100 * 1024)]))).status).toBe(413)
+    expect((await putPhoto(c.clerk, w.u.student2, Buffer.concat([PNG, Buffer.alloc(10 * 1024 * 1024 + 100 * 1024)]))).status).toBe(413)
     expect((await putPhoto(c.clerk, w.u.teacher, PNG)).status).toBe(404) // only students have ID card photos
     expect((await putPhoto(c.clerk, wb.u.student, PNG)).status).toBe(404) // another school's student
     expect(await prisma.studentPhoto.count({ where: { studentId: w.u.student2 } })).toBe(0)

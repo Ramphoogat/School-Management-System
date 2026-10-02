@@ -12,10 +12,17 @@ const MAX_LEN = 2000
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  /** Class members (student, teacher) and school-wide chat roles (principal). */
+  /** Class members (student, teacher), parents of a child in the class, and the school-wide roles (principal, admin, clerk). */
   async assertAccess(user: AuthUser, classId: string) {
     const cls = await this.prisma.class.findFirst({ where: { id: classId, schoolId: user.schoolId }, select: { id: true } })
-    if (!cls || !can(user, 'chat', 'write', { classId })) throw new ForbiddenException()
+    if (!cls) throw new ForbiddenException()
+    if (can(user, 'chat', 'write', { classId })) return
+    // A parent joins the class chat through a child of theirs who is in the class (an approved parent link).
+    if (user.role === 'parent') {
+      const kid = await this.prisma.classMember.findFirst({ where: { classId, userId: { in: user.linkedStudentIds ?? [] } }, select: { userId: true } })
+      if (kid && can(user, 'chat', 'write', { studentId: kid.userId })) return
+    }
+    throw new ForbiddenException()
   }
 
   /** A custom text channel must belong to this class; no channelId means the class's main chat. */

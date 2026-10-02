@@ -41,6 +41,26 @@ async function refreshTokens(): Promise<boolean> {
   return refreshing
 }
 
+/**
+ * The access token, renewed first if it has expired or is about to (they last 15 minutes). fetch() renews it by itself when a
+ * request is refused, but a socket connection cannot, so chat, messages, presence and calls ask for it here every time they
+ * connect or reconnect. Without this a page left open for a while connects with a dead token and sits on "Connecting…".
+ */
+export async function freshAccessToken(): Promise<string | null> {
+  const t = tokens.access
+  if (!t) return null
+  try {
+    const payload = JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) as { exp?: number }
+    if (typeof payload.exp !== 'number' || payload.exp * 1000 - Date.now() > 30_000) return t
+  } catch { return t } // not a token we can read: use it as it is
+  return (await refreshTokens()) ? tokens.access : t
+}
+
+/** The `auth` option for a socket.io connection: a fresh token on every connection attempt, plus any extra fields. */
+export const socketAuth = (extra: () => Record<string, unknown> = () => ({})) => (cb: (data: object) => void) => {
+  void freshAccessToken().then((token) => cb({ token, ...extra() }))
+}
+
 /** A list the server may have cut off: the rows, and how many matched in all. */
 export interface Listed<T> { rows: T[]; total: number }
 
@@ -87,7 +107,22 @@ export async function uploadFile<T = unknown>(path: string, file: File, title?: 
   const res = await fetch(`${BASE}/api${path}`, { method, headers: tokens.access ? { authorization: `Bearer ${tokens.access}` } : {}, body })
   if (res.status === 401 && retry && (await refreshTokens())) return uploadFile<T>(path, file, title, false, method)
   if (!res.ok) {
-    let msg = res.status === 413 ? 'File is too large (max 10 MB)' : res.statusText
+    let msg = res.status === 413 ? 'File is too large (max 100 MB)' : res.statusText
+    try { const d = await res.json(); msg = Array.isArray(d.message) ? d.message.join(', ') : d.message ?? msg } catch { /* non-JSON error body */ }
+    throw new ApiError(res.status, msg)
+  }
+  return res.json() as Promise<T>
+}
+
+/** Upload one file together with some text fields. The fields go first, so the server has read them by the time the file arrives. */
+export async function uploadForm<T = unknown>(path: string, file: File, fields: Record<string, string>, retry = true): Promise<T> {
+  const body = new FormData()
+  for (const [k, v] of Object.entries(fields)) if (v) body.append(k, v)
+  body.append('file', file)
+  const res = await fetch(`${BASE}/api${path}`, { method: 'POST', headers: tokens.access ? { authorization: `Bearer ${tokens.access}` } : {}, body })
+  if (res.status === 401 && retry && (await refreshTokens())) return uploadForm<T>(path, file, fields, false)
+  if (!res.ok) {
+    let msg = res.status === 413 ? 'File is too large (max 100 MB)' : res.statusText
     try { const d = await res.json(); msg = Array.isArray(d.message) ? d.message.join(', ') : d.message ?? msg } catch { /* non-JSON error body */ }
     throw new ApiError(res.status, msg)
   }

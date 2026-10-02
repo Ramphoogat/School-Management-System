@@ -6,7 +6,9 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
-    "test": "node test/run.mjs"
+    "test": "node test/run.mjs",
+    "storage:check": "node scripts/storage.mjs check",
+    "storage:migrate": "node scripts/storage.mjs migrate"
   },
   "dependencies": {
     "@fontsource/noto-sans": "^5.3.0",

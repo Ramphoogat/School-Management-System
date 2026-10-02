@@ -28,7 +28,7 @@ const ta: Record<string, string> = {
   '(you)': '(நீங்கள்)', 'Loading members…': 'உறுப்பினர்கள் ஏற்றப்படுகிறார்கள்…', 'No monitor': 'வகுப்புத் தலைவர் இல்லை', 'No members in this class yet.': 'இந்த வகுப்பில் இன்னும் உறுப்பினர்கள் இல்லை.',
   'Photo for {name}': '{name} க்கான புகைப்படம்', 'Drag to position the face inside the frame, and use the slider to zoom.': 'முகத்தை சட்டத்துக்குள் அமைக்க இழுக்கவும், பெரிதாக்க ஸ்லைடரைப் பயன்படுத்தவும்.',
   'Photo preview. Drag to move it.': 'புகைப்பட முன்னோட்டம். நகர்த்த இழுக்கவும்.',
-  'File shared': 'கோப்பு பகிரப்பட்டது', 'PDF, images, Word or text, up to 10 MB': 'PDF, படங்கள், Word அல்லது உரை, 10 MB வரை', 'No files shared yet.': 'இன்னும் கோப்புகள் பகிரப்படவில்லை.',
+  'File shared': 'கோப்பு பகிரப்பட்டது', 'PDF, images, Word or text, up to 100 MB': 'PDF, படங்கள், Word அல்லது உரை, 100 MB வரை', 'No files shared yet.': 'இன்னும் கோப்புகள் பகிரப்படவில்லை.',
   'Your school’s plan ends soon.': 'உங்கள் பள்ளியின் திட்டம் விரைவில் முடிகிறது.', 'Your school’s plan has ended.': 'உங்கள் பள்ளியின் திட்டம் முடிந்துவிட்டது.',
   'Your school’s plan has ended, so new students cannot be added.': 'உங்கள் பள்ளியின் திட்டம் முடிந்துவிட்டது, எனவே புதிய மாணவர்களைச் சேர்க்க முடியாது.', 'See the plan': 'திட்டத்தைப் பார்',
 
@@ -64,10 +64,10 @@ const ta: Record<string, string> = {
   'User': 'பயனர்', 'Requested by': 'கோரியவர்', 'Requested role': 'கோரப்பட்ட பங்கு', 'Needs action': 'நடவடிக்கை தேவை',
 
   // Branding
-  'Saved': 'சேமிக்கப்பட்டது', 'The logo must be a PNG or JPG picture': 'லோகோ PNG அல்லது JPG படமாக இருக்க வேண்டும்', 'The logo must be under 500 KB': 'லோகோ 500 KB க்குள் இருக்க வேண்டும்',
+  'Saved': 'சேமிக்கப்பட்டது', 'The logo must be a PNG or JPG picture': 'லோகோ PNG அல்லது JPG படமாக இருக்க வேண்டும்', 'The logo must be under 5 MB': 'லோகோ 5 MB க்குள் இருக்க வேண்டும்',
   'Logo updated': 'லோகோ புதுப்பிக்கப்பட்டது', 'Logo removed': 'லோகோ நீக்கப்பட்டது', 'How your school looks on the sign-in page and across the app.': 'உள்நுழைவுப் பக்கத்திலும் செயலி முழுவதும் உங்கள் பள்ளி எப்படித் தோன்றும்.',
   'School name': 'பள்ளியின் பெயர்', 'Tagline': 'கருப்பொருள் வரி', '(shown under the name on the sign-in page)': '(உள்நுழைவுப் பக்கத்தில் பெயருக்குக் கீழே காட்டப்படும்)', 'e.g. Learning together': 'எ.கா: ஒன்றாகக் கற்போம்',
-  'Logo': 'லோகோ', 'School logo': 'பள்ளி லோகோ', 'PNG or JPG, up to 500 KB. A square picture on a plain background works best.': 'PNG அல்லது JPG, 500 KB வரை. எளிய பின்னணியில் சதுரப் படம் சிறந்தது.',
+  'Logo': 'லோகோ', 'School logo': 'பள்ளி லோகோ', 'PNG or JPG, up to 5 MB. A square picture on a plain background works best.': 'PNG அல்லது JPG, 5 MB வரை. எளிய பின்னணியில் சதுரப் படம் சிறந்தது.',
   'Preview of your sign-in page': 'உங்கள் உள்நுழைவுப் பக்க முன்னோட்டம்',
 
   // Class channels
@@ -132,7 +132,7 @@ const ta: Record<string, string> = {
   'This conversation has been reported and can be reviewed by the school. Messages in it can\'t be edited or deleted for now.': 'இந்த உரையாடல் புகாரளிக்கப்பட்டுள்ளது, பள்ளி இதை மதிப்பாய்வு செய்யலாம். தற்போது இதிலுள்ள செய்திகளைத் திருத்தவோ நீக்கவோ முடியாது.',
   'Load earlier messages': 'முந்தைய செய்திகளை ஏற்று', 'No messages yet. Say hello to {value}.': 'இன்னும் செய்திகள் இல்லை. {value} க்கு வணக்கம் சொல்லுங்கள்.', 'About': 'குறித்து', 'This message was deleted': 'இந்தச் செய்தி நீக்கப்பட்டது',
   'Message options': 'செய்தி விருப்பங்கள்', 'Under review': 'மதிப்பாய்வில்', 'Report message': 'செய்தியைப் புகாரளி', '· edited': '· திருத்தப்பட்டது', 'Seen': 'பார்த்தார்', 'Sent': 'அனுப்பப்பட்டது', '{value} is typing…': '{value} தட்டச்சு செய்கிறார்…',
-  'Uploading…': 'பதிவேற்றுகிறது…', 'Which child is this about': 'இது எந்தக் குழந்தையைப் பற்றியது', 'Attach a file': 'கோப்பை இணை', 'Attach a file (PDF, image, Word, text; up to 10 MB)': 'கோப்பை இணை (PDF, படம், Word, உரை; 10 MB வரை)',
+  'Uploading…': 'பதிவேற்றுகிறது…', 'Which child is this about': 'இது எந்தக் குழந்தையைப் பற்றியது', 'Attach a file': 'கோப்பை இணை', 'Attach a file (PDF, image, Word, text; up to 100 MB)': 'கோப்பை இணை (PDF, படம், Word, உரை; 100 MB வரை)',
   'You blocked {name}. Unblock to message again.': 'நீங்கள் {name} ஐத் தடுத்துள்ளீர்கள். மீண்டும் செய்தி அனுப்ப தடையை நீக்குங்கள்.', 'Unblock': 'தடையை நீக்கு', 'You can no longer message this person. You can still read this conversation.': 'இனி இவருக்குச் செய்தி அனுப்ப முடியாது. இந்த உரையாடலைப் படிக்கலாம்.',
   'New': 'புதிய', 'No conversations yet.': 'இன்னும் உரையாடல்கள் இல்லை.', 'Start one': 'ஒன்றைத் தொடங்கு', 'Choose a conversation, or start a new one.': 'ஒரு உரையாடலைத் தேர்ந்தெடுக்கவும், அல்லது புதிதாகத் தொடங்கவும்.',
 

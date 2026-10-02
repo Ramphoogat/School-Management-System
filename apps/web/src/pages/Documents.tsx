@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { api, downloadFile, uploadFile } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { AddFromLink } from '@/components/LinkImport'
 import { useT } from '@/lib/i18n'
 
 interface Doc { id: string; title: string; name: string; size: number; createdAt: string; uploadedBy: string }
@@ -41,7 +42,8 @@ export default function Documents() {
           <Input className="w-64" placeholder={t('Title (optional)')} value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} />
           <input ref={input} type="file" hidden accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.txt" onChange={(e) => pick(e.target.files?.[0])} />
           <Button size="sm" disabled={busy} onClick={() => input.current?.click()}><Upload className="mr-1 size-4" />{busy ? 'Uploading…' : 'Publish a file'}</Button>
-          <span className="text-xs text-muted-foreground">{t('PDF, images, Word or text, up to 10 MB')}</span>
+          <AddFromLink path="/documents" extra={title.trim() ? { title: title.trim() } : undefined} onDone={() => { setTitle(''); void load() }} />
+          <span className="text-xs text-muted-foreground">{t('PDF, images, Word or text, up to 100 MB')}</span>
         </div>
       )}
       {data.files.length === 0 ? (

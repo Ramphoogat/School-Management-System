@@ -1,5 +1,6 @@
-import { BadRequestException, Controller, Delete, ForbiddenException, Get, Module, NotFoundException, Param, Post, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Delete, ForbiddenException, Get, Module, NotFoundException, Param, Post, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { IsOptional, IsString, MaxLength } from 'class-validator'
 import type { Response } from 'express'
 import { can } from '@school/permissions'
 import { PrismaService } from '../prisma/prisma.module'
@@ -7,14 +8,20 @@ import { AuditService } from '../audit/audit.module'
 import { deleteFile, getFile, newKey, putFile } from '../storage/storage'
 import { checkUpload, contentHeaders, MAX_FILE_BYTES, type Upload } from '../storage/uploads'
 import { AuthGuard, CurrentUser, PermissionGuard, type AuthUser } from '../auth/guards'
+import { ImportService } from '../import/import.module'
 
 const MAX_FILES_PER_CLASS = 100
+
+class UploadLink {
+  /** A link to fetch the file from, instead of uploading one (Google Drive, Dropbox, OneDrive, a direct link). */
+  @IsOptional() @IsString() @MaxLength(2000) url?: string
+}
 
 /** Documents a class's teacher shares in its resources channel (notes, worksheets, syllabus). */
 @Controller('resources')
 @UseGuards(AuthGuard, PermissionGuard)
 export class ResourcesController {
-  constructor(private prisma: PrismaService, private audit: AuditService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService, private importer: ImportService) {}
 
   private async loadClass(user: AuthUser, classId: string) {
     const cls = await this.prisma.class.findFirst({ where: { id: classId, schoolId: user.schoolId } })
@@ -24,7 +31,7 @@ export class ResourcesController {
 
   /** Class members, the class teacher, school staff, and parents of a child in the class. */
   private async canRead(user: AuthUser, classId: string) {
-    if (can(user, 'resources', 'write', { classId }) || can(user, 'resources', 'read', { classId }) || can(user, 'resources', 'read')) return true
+    if (can(user, 'resources', 'write', { classId, schoolId: user.schoolId }) || can(user, 'resources', 'read', { classId }) || can(user, 'resources', 'read')) return true
     if (user.role !== 'parent') return false
     const kid = await this.prisma.classMember.findFirst({ where: { classId, userId: { in: user.linkedStudentIds ?? [] } } })
     return !!kid && can(user, 'resources', 'read', { studentId: kid.userId })
@@ -38,22 +45,23 @@ export class ResourcesController {
     const people = await this.prisma.user.findMany({ where: { id: { in: [...new Set(rows.map((r) => r.uploadedById))] } }, select: { id: true, name: true } })
     const who = new Map(people.map((p) => [p.id, p.name]))
     return {
-      canUpload: can(user, 'resources', 'write', { classId }),
+      canUpload: can(user, 'resources', 'write', { classId, schoolId: user.schoolId }),
       files: rows.map((r) => ({ id: r.id, name: r.name, size: r.size, createdAt: r.createdAt, uploadedBy: who.get(r.uploadedById) ?? '' })),
     }
   }
 
   @Post('class/:classId')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_FILE_BYTES, files: 1 } }))
-  async upload(@CurrentUser() user: AuthUser, @Param('classId') classId: string, @UploadedFile() file: Upload | undefined) {
+  async upload(@CurrentUser() user: AuthUser, @Param('classId') classId: string, @Body() body: UploadLink, @UploadedFile() file: Upload | undefined) {
     await this.loadClass(user, classId)
-    if (!can(user, 'resources', 'write', { classId })) throw new ForbiddenException()
-    const checked = checkUpload(file)
+    if (!can(user, 'resources', 'write', { classId, schoolId: user.schoolId })) throw new ForbiddenException()
+    const upload = file ?? (body?.url?.trim() ? await this.importer.fromLink(user, body.url) : undefined)
+    const checked = checkUpload(upload)
     if ((await this.prisma.resourceFile.count({ where: { classId } })) >= MAX_FILES_PER_CLASS) throw new BadRequestException(`This class already has ${MAX_FILES_PER_CLASS} files. Remove some first.`)
     const storageKey = newKey()
-    await putFile(storageKey, file!.buffer)
+    await putFile(storageKey, upload!.buffer, { schoolId: user.schoolId })
     try {
-      const row = await this.prisma.resourceFile.create({ data: { schoolId: user.schoolId, classId, uploadedById: user.id, name: checked.name, mime: checked.mime, size: file!.size, storageKey } })
+      const row = await this.prisma.resourceFile.create({ data: { schoolId: user.schoolId, classId, uploadedById: user.id, name: checked.name, mime: checked.mime, size: upload!.size, storageKey } })
       await this.audit.log(this.prisma, { schoolId: user.schoolId, actorId: user.id, action: 'resource.uploaded', resource: 'resource', resourceId: row.id, meta: { classId, name: row.name, size: row.size } })
       return { id: row.id, name: row.name, size: row.size, createdAt: row.createdAt, uploadedBy: user.name }
     } catch (e) {
@@ -78,11 +86,11 @@ export class ResourcesController {
     res.end(data)
   }
 
-  /** The class's teacher removes files. */
+  /** The class's teacher, and school staff (admin, principal, clerk), remove files. */
   @Delete('files/:id')
   async remove(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     const f = await this.loadFile(user, id)
-    if (!can(user, 'resources', 'write', { classId: f.classId })) throw new ForbiddenException()
+    if (!can(user, 'resources', 'write', { classId: f.classId, schoolId: user.schoolId })) throw new ForbiddenException()
     await this.prisma.resourceFile.delete({ where: { id } })
     await deleteFile(f.storageKey)
     await this.audit.log(this.prisma, { schoolId: user.schoolId, actorId: user.id, action: 'resource.deleted', resource: 'resource', resourceId: id, meta: { classId: f.classId, name: f.name } })

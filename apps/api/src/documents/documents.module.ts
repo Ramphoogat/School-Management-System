@@ -8,18 +8,21 @@ import { AuditService } from '../audit/audit.module'
 import { deleteFile, getFile, newKey, putFile } from '../storage/storage'
 import { checkUpload, contentHeaders, MAX_FILE_BYTES, type Upload } from '../storage/uploads'
 import { AuthGuard, CurrentUser, PermissionGuard, type AuthUser } from '../auth/guards'
+import { ImportService } from '../import/import.module'
 
 const MAX_DOCUMENTS = 200
 
 class UploadMeta {
   @IsOptional() @IsString() @MaxLength(120) title?: string
+  /** A link to fetch the file from, instead of uploading one (Google Drive, Dropbox, OneDrive, a direct link). */
+  @IsOptional() @IsString() @MaxLength(2000) url?: string
 }
 
 /** School-wide documents: forms, circulars, policies. Clerk, principal and admin publish; everyone in the school downloads. */
 @Controller('documents')
 @UseGuards(AuthGuard, PermissionGuard)
 export class DocumentsController {
-  constructor(private prisma: PrismaService, private audit: AuditService) {}
+  constructor(private prisma: PrismaService, private audit: AuditService, private importer: ImportService) {}
 
   @Get()
   async list(@CurrentUser() user: AuthUser) {
@@ -36,13 +39,14 @@ export class DocumentsController {
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_FILE_BYTES, files: 1 } }))
   async upload(@CurrentUser() user: AuthUser, @Body() meta: UploadMeta, @UploadedFile() file: Upload | undefined) {
     if (!can(user, 'documents', 'write')) throw new ForbiddenException()
-    const checked = checkUpload(file)
+    const upload = file ?? (meta.url?.trim() ? await this.importer.fromLink(user, meta.url) : undefined)
+    const checked = checkUpload(upload)
     if ((await this.prisma.schoolDocument.count({ where: { schoolId: user.schoolId } })) >= MAX_DOCUMENTS) throw new BadRequestException(`The school already has ${MAX_DOCUMENTS} documents. Remove some first.`)
     const storageKey = newKey()
-    await putFile(storageKey, file!.buffer)
+    await putFile(storageKey, upload!.buffer, { schoolId: user.schoolId })
     try {
       const title = meta.title?.trim() || checked.name.replace(/\.[^.]+$/, '')
-      const row = await this.prisma.schoolDocument.create({ data: { schoolId: user.schoolId, uploadedById: user.id, title, name: checked.name, mime: checked.mime, size: file!.size, storageKey } })
+      const row = await this.prisma.schoolDocument.create({ data: { schoolId: user.schoolId, uploadedById: user.id, title, name: checked.name, mime: checked.mime, size: upload!.size, storageKey } })
       await this.audit.log(this.prisma, { schoolId: user.schoolId, actorId: user.id, action: 'document.uploaded', resource: 'document', resourceId: row.id, meta: { title, name: row.name, size: row.size } })
       return { id: row.id, title: row.title, name: row.name, size: row.size, createdAt: row.createdAt, uploadedBy: user.name }
     } catch (e) {

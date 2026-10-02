@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { downloadFile, uploadFile } from '@/lib/api'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { AddFromLink } from '@/components/LinkImport'
 
 export interface HwFile { id: string; name: string; size: number }
 const kb = (n: number) => (n >= 1_048_576 ? `${(n / 1_048_576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`)
@@ -29,7 +30,7 @@ export function FileChips({ files, onChanged, canRemove }: { files: HwFile[]; on
 }
 
 /** File picker that uploads straight away. */
-export function AttachButton({ assignmentId, label, onDone }: { assignmentId: string; label: string; onDone: () => void }) {
+export function AttachButton({ assignmentId, label, onDone, allowLink = false }: { assignmentId: string; label: string; onDone: () => void; /** Also offer "From a link". For teachers only: students always upload from their own device. */ allowLink?: boolean }) {
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const pick = async (file?: File) => {
@@ -41,6 +42,7 @@ export function AttachButton({ assignmentId, label, onDone }: { assignmentId: st
     <>
       <input ref={input} type="file" hidden accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.txt" onChange={(e) => pick(e.target.files?.[0])} />
       <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => input.current?.click()}><Paperclip className="mr-1 size-3" />{busy ? 'Uploading…' : label}</Button>
+      {allowLink && <AddFromLink path={`/homework/${assignmentId}/files`} onDone={onDone} />}
     </>
   )
 }
