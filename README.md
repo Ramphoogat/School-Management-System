@@ -6,43 +6,138 @@ A web-based school management system with **role-specific dashboards** (Student,
 
 ---
 
-## Current status (30 Sep 2026)
+## Current status (2 Oct 2026)
 
-The plan below has been built. All six phases work, plus extras that were not in the plan. Read this section first; the rest of the
-file is the original plan and design, kept because it still explains *why* things are the way they are. Where the plan and the code
-differ, this section and the code win.
+The plan below has been built. All six phases work, plus extras that were not in the plan. This section is the up-to-date guide:
+what the project is, how it is laid out, how to install it and how to run it. The rest of the file is the original plan and design,
+kept because it still explains *why* things are the way they are. Where the plan and the code differ, this section and the code win.
 
-**What exists**
+### What exists
 
-- Six roles with permissions checked on the API, class workspaces with channels (announcements, attendance, homework, chat, voice, resources, grades), bulk actions and approval queues on everything that has a queue.
-- Academics: attendance (with approved leave counted), homework with file hand-ins, exams with approval, report cards and certificates as PDFs, academic years and terms, a configurable grade scale, timetable with clash checks.
-- Operations: admissions with CSV import, fees with online payment (Razorpay), waivers, full and partial refunds and reminders, ID cards with photos, school-wide documents, class resources.
-- Communication: announcements (editable), class chat, voice channels, direct messages (attachments, edit, delete, read receipts, block, report and review), notifications by in-app, email and WhatsApp with quiet hours and editable wording.
-- Many schools on one platform: a super admin creates and suspends schools, each school has its own address, branding, plan and data, and can export or (by the super admin) permanently delete its data.
-- Five interface languages (English, Hindi, Telugu, Tamil, Marathi) and partial Haryanvi and Sanskrit layers, themes and wallpapers that keep text readable, and an accessibility pass (landmarks, skip link, keyboard, contrast).
+- **Roles and workspace:** six school roles (student, parent, teacher, clerk, principal, admin) plus a platform super admin. Permissions are checked on the API. Each class is a workspace with channels (announcements, attendance, homework, chat, voice, resources, grades, books). A sidebar groups the pages (School, People, Learning, Fees and records, Messaging, Storage, Security).
+- **Academics:** attendance (approved leave counts), homework with file hand-ins, exams with approval, report cards and certificates as PDFs, academic years and terms, a configurable grade scale, timetable with clash checks.
+- **Operations:** admissions with CSV import, fees with online payment (Razorpay), waivers, refunds and reminders, ID cards with photos, school documents, class resources (teachers upload to their own class; admin, principal and clerk can upload and delete in any class, from a file or a pasted link).
+- **Communication:** editable announcements, class chat, voice channels, direct messages (attachments, edit, delete, read receipts, block, report and review), notifications by in-app, email and WhatsApp with quiet hours and editable wording. A **Notifications page** lists everything sent to you, read and unread, with filters and "mark all read".
+- **Many schools on one platform:** a super admin creates and suspends schools; each school has its own address, branding, plan and data, and can export its data (or have it permanently deleted by the super admin).
+- **Plan and data page:** shows the school plan and student limit, exports all school records as one file, and **bulk-adds people from a CSV** (admin and principal). Each new person gets a temporary password, the plan student limit is checked for the whole file, and the passwords can be downloaded once.
+- **Settings page** (Security > Settings): password change and a single place to reach every setting the person may use.
+- **MCP connections** (Settings > MCP connections): admin and principal create keys so an outside application, such as an AI assistant, can connect to the school MCP server (`POST /api/mcp`). A connection acts as the person who made it, with only their access, and only reads. Tools: `school_overview`, `list_classes`, `list_people`, `list_announcements`, `list_notifications`. Keys are stored hashed, shown once, rate-limited and can be disconnected at any time.
+- **Storage:** local disk, any S3-compatible bucket, and Google Drive as extra storage, with optional ClamAV scanning. School cameras (HLS and MJPEG) for staff.
+- **Languages and access:** English, Hindi, Telugu, Tamil, Marathi, plus partial Haryanvi and Sanskrit. Themes and wallpapers that keep text readable, and an accessibility pass (landmarks, skip link, keyboard, contrast). Some newer labels are still English-only.
 
-**How it is actually built** (this differs from section 9 in places)
+### Technology
 
 | Part | Choice |
 |---|---|
 | Web | Vite, React 19, TypeScript, Tailwind, shadcn/ui, react-router, recharts, socket.io-client (a single-page app, not Next.js) |
 | API | NestJS 10, Prisma 6, PostgreSQL 16, Socket.IO, nodemailer |
 | Shared | `packages/permissions` (roles and scope checks used by web and API), `packages/db` (schema, migrations, seed) |
-| Queue and jobs | A database table polled inside the API, and an in-process hourly reminder job. Redis and BullMQ are not used yet. |
-| Files | Local disk by default, or an S3-compatible bucket (Amazon S3, Cloudflare R2, MinIO) by setting `S3_BUCKET`. Optional ClamAV virus scanning. |
-| Tooling | pnpm workspace, Docker for Postgres, Vitest |
+| Queue and jobs | A database table polled inside the API and an in-process hourly reminder job. Redis and BullMQ are not used yet. |
+| Files | Local disk by default, or an S3-compatible bucket (Amazon S3, Cloudflare R2, MinIO) via `S3_BUCKET`; optional Google Drive and ClamAV. |
+| Tooling | pnpm workspace, Docker for PostgreSQL, Vitest |
 
-**Tests:** the API suite (`apps/api`) has 345 tests in 27 files and the web suite (`apps/web`) has 38 tests in 6 files. Each API run
-uses its own database and build folder, so runs never interfere.
+### Project structure
 
-**Not yet proven against the real thing:** WhatsApp (Meta), Razorpay live payments and webhooks, a real email provider, an S3 or R2 bucket,
-ClamAV, voice on real devices and networks, and the installable-app worker. They are built and tested against stand-ins. The interface
-translations were written without a native-speaker review. See `PROGRESS.md` section 4 for the full list.
+```
+school web app/
+├── apps/
+│   ├── api/                      NestJS API (port 4000, all routes under /api)
+│   │   ├── src/
+│   │   │   ├── main.ts, app.module.ts, env.ts
+│   │   │   ├── auth/             sign-in, tokens, guards, rate limits, password reset
+│   │   │   ├── users/ students/ classes/ links/ role-requests/   people, classes, parent links, approvals
+│   │   │   ├── academic/ attendance/ leave/ homework/ exams/ timetable/   teaching and results
+│   │   │   ├── admissions/ fees/ certificates/ idcards/ documents/        office work
+│   │   │   ├── announcements/ chat/ messages/ voice/ notifications/       communication
+│   │   │   ├── resources/ books/ storage/ import/ pdf/                    files, links, PDFs
+│   │   │   ├── platform/ billing/ school-data/                            schools, plans, export and delete
+│   │   │   ├── cameras/ insights/ audit/ events/ live/                    cameras, analytics, audit log, live updates
+│   │   │   ├── mcp/              MCP server and connection keys
+│   │   │   └── common/ prisma/   security headers, shared helpers, database service
+│   │   ├── test/                 API tests (real database, real sign-ins)
+│   │   └── scripts/              storage tools
+│   └── web/                      React app (port 3000)
+│       ├── src/
+│       │   ├── App.tsx           every route and the permission it needs
+│       │   ├── pages/            one file per screen (Home, Channels, Messages, Fees, SchoolPlan, SecuritySettings, Mcp, NotificationsPage, ...)
+│       │   ├── components/       shared pieces; components/ui/ holds the shadcn/ui parts
+│       │   └── lib/              api.ts, auth.tsx, nav.ts (sidebar), i18n/ (languages), live.ts, appearance.tsx, ...
+│       └── test/                 web tests (Vitest, jsdom, Testing Library)
+├── packages/
+│   ├── db/                       prisma/schema.prisma, prisma/migrations/, prisma/seed.ts
+│   └── permissions/              roles and `resource:action:scope` rules, shared by web and API
+├── docs/                         SETUP.md, API.md (every route), DEPLOYMENT.md
+├── scripts/                      gen-api-docs.mjs
+├── docker-compose.yml            PostgreSQL 16
+├── .env.example                  every setting, with comments
+├── PROGRESS.md                   what is done, unverified and left
+└── SERVICES.md                   every outside account and key
+```
 
-**Where to read more**
+### Install
+
+You need **Node.js 22+**, **pnpm 10** (`npm i -g pnpm`), **Docker Desktop** (for PostgreSQL) and **Git**. No outside accounts are needed to run locally.
+
+```bash
+git clone https://github.com/Ramphoogat/School-Management-System.git
+cd School-Management-System
+pnpm install
+cp .env.example .env        # on Windows PowerShell: Copy-Item .env.example .env
+docker compose up -d        # starts PostgreSQL 16 on port 5432
+pnpm db:migrate             # creates the tables (run again after pulling new migrations)
+pnpm db:seed                # creates a demo school with one person per role
+```
+
+The defaults in `.env.example` work locally. Email, WhatsApp, online payment, S3, Google Drive and ClamAV stay off until you add their keys (see `SERVICES.md`).
+
+### Run
+
+```bash
+pnpm dev                    # web on http://localhost:3000 and API on http://localhost:4000
+```
+
+Open <http://localhost:3000> and sign in with a demo account:
+
+| Role | Email | Password |
+|---|---|---|
+| Student, Parent, Teacher, Clerk, Principal, Admin | `<role>@school.test` (e.g. `admin@school.test`) | `password123` |
+| Super admin | `superadmin@school.test` | `password123` (created at API start from `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD`) |
+
+These accounts are for your own machine only; never create them on a real server. After changing permissions (`packages/permissions`) or the database schema (`packages/db`), rebuild those packages and restart the dev server so the API picks the change up:
+
+```bash
+pnpm --filter @school/permissions build
+pnpm --filter @school/db build
+```
+
+Other commands:
+
+| Command | What it does |
+|---|---|
+| `pnpm build` | Builds every package and both apps |
+| `pnpm test` | Runs every test suite (API tests need PostgreSQL running) |
+| `cd apps/api && pnpm test <name>` | One API test file, e.g. `pnpm test resources` |
+| `cd apps/web && npx tsc -b` | Type-checks the web app |
+| `pnpm db:generate` | Regenerates the database client after a schema change |
+
+To read the email the app sends without a real provider, run Mailpit (`docker run -d --name mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit`), set `EMAIL_HOST=localhost` and `EMAIL_PORT=1025` in `.env`, and open <http://localhost:8025>.
+
+### Configuration
+
+All settings live in `.env` (documented line by line in `.env.example`). The important ones: `DATABASE_URL`, `JWT_SECRET` and `JWT_REFRESH_SECRET` (must be long and random in production), `WEB_ORIGIN`, `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD`, and the optional groups for email (`EMAIL_*`), WhatsApp (`WHATSAPP_*`), Razorpay (`RAZORPAY_*`), file storage (`UPLOAD_DIR`, `S3_*`, `GDRIVE_*`) and virus scanning (`CLAMAV_*`). With `NODE_ENV=production` the API refuses to start with weak secrets or a localhost address.
+
+### Tests
+
+The API suite uses a real PostgreSQL database: each run creates its own temporary database and build folder, so runs never interfere. The web suite uses Vitest and jsdom against a stand-in API. Email, WhatsApp and Razorpay are replaced by stand-ins in tests.
+
+### Not yet proven against the real thing
+
+WhatsApp (Meta), Razorpay live payments and webhooks, a real email provider, an S3 or R2 bucket, ClamAV, voice on real devices and networks, and the installable-app worker. They are built and tested against stand-ins. The interface translations were written without a native-speaker review. See `PROGRESS.md` section 4 for the full list.
+
+### Where to read more
 
 - `PROGRESS.md`: what is done, what has not been verified, and what is left, in order.
-- `docs/SETUP.md`: setting up a development machine. `docs/API.md`: every API route and socket event. `docs/DEPLOYMENT.md`: putting it on a server.
+- `docs/SETUP.md`: setting up a development machine in detail. `docs/API.md`: every API route and socket event. `docs/DEPLOYMENT.md`: putting it on a server.
 - `SERVICES.md`: every outside account and key, and what to look for in each.
 
 ---
